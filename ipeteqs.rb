@@ -7,10 +7,10 @@ class Object
   def imprimaln(args='')
     code="print #{exp_converter(args)}; "
     puts exp_converter(args)
-    code<<"puts; "
+    code<< "puts; "
     code
   end
-  def leia args #neessita ajeitar
+  def leia args #necessita ajeitar
     code=""
     ar_args=args.split(",")
     ar_args.each do |arg|
