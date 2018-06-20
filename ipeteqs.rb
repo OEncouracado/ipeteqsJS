@@ -15,8 +15,8 @@ class Object
     ar_args=args.split(",")
     ar_args.each do |arg|
       code<<arg+"=gets.chomp; "
-      code<<"if #{arg}.to_i.to_s == #{arg}; "
-      code<<"  #{arg}=#{arg}.to_i; "
+      code<< "if #{arg}.to_i.to_s == #{arg}; "
+      code<< "  #{arg}=#{arg}.to_i; "
       code<< "end; "
     end
     code
@@ -221,4 +221,5 @@ str="função teste()
 início
 x<-3
 fim"
-execute str
+#execute str
+exp_converter('3 mod 2')
