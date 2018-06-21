@@ -15,7 +15,7 @@
  const PeteqsCore = {
      imprima : function(args=''){
         let statement =  PeteqsHelper.exp_converter(args);
-        return ```print(${statement});```
+        return `print(${statement});`
      },
      imprimaln: function(args=''){
         return PeteqsCore.imprima(args)+"print('\n')";
@@ -32,15 +32,14 @@
         cond = cond.substring(0,-6) // Var == Verdadeiro 
         cond = cond.trim();//Limpar whitespace
         
-        return ```if(${cond}){```;
+        return `if(${cond}){`;
      },
      senao: function(cond=''){
          if(cond.trim().substring(0,1) == 'se'){ //SENÃO SE var == Falso
              cond = cond.substring(2)
+             cond = PeteqsCore.se(cond);
          }
-         else{
-             return "else{";
-         }
+         return cond ? "else "+ cond : "else{";
      },
      funcao: function(args){
          
@@ -48,8 +47,20 @@
      enquanto: function(args){
          
      },
-     para: function(args){
-         
+     para: function(linha){
+        linha = linha.substr(4, linha.length-4).trim();
+
+        let args =  (function(){
+            let split_linha = linha.split('<-');
+            let variavel = split_linha[0].trim();
+            let min = split_linha[1].match('[0-9]*.')[0]; //O número é o unico grupo de captura
+            let max = split_linha[1].match('(ATÉ|até) ([0-9]*.)')[2]; //O número é o segundo grupo capturado
+            
+
+            return [variavel, min, max];
+        })();
+
+        return PeteqsHelper.ptq_para(args);
      },
      fim: function(){
          
@@ -59,7 +70,7 @@
      },
  }
  
- const PeteqsHelper = {
+ var PeteqsHelper = {
      tokens: ["+","-","*","/"," mod "]
      ,
      separators: ["(",")",","]
@@ -68,14 +79,29 @@
      ,
      in_function: false
      ,
-     ptq_para: function(comeco,fim){
+     ptq_para: function(variaveis){
+         //Args é array com modelo Variavel, começo e fim
+         let variavel =  variaveis[0]; 
+         let começo = variaveis[1]; 
+         let fim = variaveis[2];
+
+         let code ="";
+
+         if(fim < começo){
+            code = `for(var ${variavel} = ${começo}; variavel> ${fim});variavel--){`;
+            return 
+         }
+         else{
+            code = `for(var ${variavel} = ${começo}; variavel< ${fim});variavel++){`;
+            return code;
+         }
        
      },
-     exp_converter: function(line){
+     exp_converter: function(linha){
          let conc = "";
          let final = "";
          
-         
+         return linha;
      },
      has_operator: function(line){
       let expressions = [];
@@ -96,8 +122,13 @@
      analyze: function(linha){
          linha = linha.trim();
          
-         if(PeteqsHelper.is_atribution){
-           PeteqsCore.atribui(linha);
+         if(PeteqsHelper.has_atribution){
+            if(linha.match('para|PARA')){
+              PeteqsCore.para(linha);
+            }
+            else{
+              PeteqsCore.atribui(linha);
+            }
          }
          else if(linha == PeteqsHelper.reserved_words[0]){
            PeteqsCore.senao(linha);
@@ -107,25 +138,12 @@
          }
          
      },
-     is_atribution:function(line){
-       let space = line.match(" ");
-       let atribution = line.match("<-");
-       
-       if(!PeteqsHelper.reserved_words.includes(line)){
-         if (((atribution.length < space.length && space.length != 0) && atribution != null) || space == null){
-          return true
-         }
-       }
-       else{
-        return false
-       }
+     has_atribution:function(line){
+        return line.match("<-");
      },
      execute: function(comeco,fim){
          
      }
  }
- 
- PeteqsHelper.token_split('1+1')
 
- 
- 
+ linha = 'para i<-1 até 722 faça';

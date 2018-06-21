@@ -77,8 +77,9 @@ class Object
     "while "+cond+"; "
   end
   def para(args)
-    args=args[0..-4]
-    args.rstrip!
+    #PARA i<-1 até 5 faça
+    args=args[0..-4] #remove o faça
+    args.rstrip! #limpa os espaços em branco
     pos=args=~/<-/
     vari=args[0..pos-1]
     args=args[pos+2..args.length]
