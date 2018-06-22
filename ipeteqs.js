@@ -47,11 +47,13 @@ const PeteqsCore = {
         return `if(${cond}){`;
     },
     senao: function (cond = '') {
+        cond = cond.replace('senão','');
+
         if (cond.trim().substring(0, 1) == 'se') { //SENÃO SE var == Falso
             cond = cond.substring(2)
             cond = PeteqsCore.se(cond);
         }
-        return cond ? "else " + cond : "else{";
+        return cond ? "}else " + cond : "}else{";
     },
     funcao: function (args) {
 
@@ -165,12 +167,12 @@ var PeteqsHelper = {
         else if (linha.match("leia")){
             return PeteqsCore.leia(linha);
         }
-        else if (linha.match("se")){
-            return PeteqsCore.se(linha);
-        }
         else if (linha.match("senão")){
             return PeteqsCore.senao(linha);
         }
+        else if (linha.match("se")){
+            return PeteqsCore.se(linha);
+        }        
         else if (linha.match("para")){
             return PeteqsCore.para(linha);
         }
@@ -214,6 +216,8 @@ leia a
 para i<-1 até a faça
   se i mod 2 = 0
     imprimaln i
+  senão
+    imprimaln 'brasil'
   fim se
 próximo i`;
 
