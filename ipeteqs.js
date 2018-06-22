@@ -7,18 +7,25 @@
 
 var vars = [];
 
-//Usar como objeto (ex.: x = new Variavel('abc') retorna x.valor = 'abc')
-function Variavel(valor) {
-    return { valor: valor };
+//Assinatura da função PQPrint = PQPrint(target, arg1,arg2....argN)
+function PQprint(target){
+
+    //arguments[0] é target
+    for (var i=1; i < arguments.length; i++) {
+        if(arguments[i]){
+            target.innerHTML += arguments[i];
+        }
+    }
+
 }
 
 const PeteqsCore = {
     imprima: function (args = '') {
         let statement = PeteqsHelper.exp_converter(args.replace(/imprimaln|imprima/,''));
-        return `document.write(${statement});`
+        return `PQprint(target,${statement});`
     },
     imprimaln: function (args = '') {
-        return PeteqsCore.imprima(args) + "\ndocument.write('<br>')";
+        return PeteqsCore.imprima(args) + "\nPQprint(target,'<br>')";
     },
     leia: function (linha) {
         linha = linha.substring(4,linha.length); //Remove o leia
@@ -105,11 +112,11 @@ var PeteqsHelper = {
         let code = "";
 
         if (fim < começo) {
-            code = `for(var ${variavel} = ${começo}; ${variavel}> ${fim};${variavel}--){`;
+            code = `for(var ${variavel} = ${começo}; ${variavel}>= ${fim};${variavel}--){`;
             return
         }
         else {
-            code = `for(var ${variavel} = ${começo}; ${variavel}< ${fim};${variavel}++){`;
+            code = `for(var ${variavel} = ${começo}; ${variavel}<= ${fim};${variavel}++){`;
             return code;
         }
 
@@ -193,7 +200,7 @@ var PeteqsHelper = {
     has_atribution: function (line) {
         return line.match("<-");
     },
-    execute: function (PQ_code) {
+    execute: function (PQ_code, target) {
 
         let lines = PQ_code.split("\n");
         let code = "";
@@ -201,11 +208,16 @@ var PeteqsHelper = {
             code+= "\n" + PeteqsHelper.analyze(lines[i]);
         }
         try{
-            console.log(code);
-            return new Function(code)();
+            if(target){
+                target.innerHTML = "";
+                PQprint(target, eval(code));             
+            }
+            else{
+                return new Function(code)();
+            }            
         }
         catch{
-            return "Existe um erro no código";
+            return PQprint(target,"Existe um erro no código");
         }
     }
 }
@@ -215,10 +227,10 @@ var linha =
 leia a
 para i<-1 até a faça
   se i mod 2 = 0
-    imprimaln i
+    imprimaln i,'-- par'
   senão
     imprimaln 'brasil'
   fim se
 próximo i`;
 
-PeteqsHelper.execute(linha);
+PeteqsHelper.execute(linha, document.getElementById('test'));
