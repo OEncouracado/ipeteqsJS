@@ -14,11 +14,11 @@ function Variavel(valor) {
 
 const PeteqsCore = {
     imprima: function (args = '') {
-        let statement = PeteqsHelper.exp_converter(args.replace('imprima',''));
-        return `print(${statement});`
+        let statement = PeteqsHelper.exp_converter(args.replace(/imprimaln|imprima/,''));
+        return `document.write(${statement});`
     },
     imprimaln: function (args = '') {
-        return PeteqsCore.imprima(args) + "print('\\n')";
+        return PeteqsCore.imprima(args) + "\ndocument.write('<br>')";
     },
     leia: function (linha) {
         linha = linha.substring(4,linha.length); //Remove o leia
@@ -30,14 +30,19 @@ const PeteqsCore = {
     atribui: function (args) {
         
         args = PeteqsHelper.exp_converter(args);
-        
+
         return args.replace("<-","=");
     },
     se: function (cond) {
-        //Ex.: SE Var == Verdadeiro ENTÃO
-        cond = cond.split(" ", 1);  // Var == Verdadeiro ENTÃO
-        cond = cond.substring(0, -6) // Var == Verdadeiro 
-        cond = cond.trim();//Limpar whitespace
+        //Ex.: SE Var = Verdadeiro ENTÃO
+        cond = cond.replace(/SE/gi, '');
+
+        if(cond.match(/Então/gi)){
+            cond = cond.substring(0, -6)
+        }
+        cond = cond.trim();
+
+        cond = PeteqsHelper.exp_converter(cond);
 
         return `if(${cond}){`;
     },
@@ -81,7 +86,7 @@ const PeteqsCore = {
 }
 
 var PeteqsHelper = {
-    tokens: ["+", "-", "*", "/", " mod "]
+    tokens: ["+", "-", "*", "/", " mod ","<>","="]
     ,
     separators: ["(", ")", ","]
     ,
@@ -108,23 +113,28 @@ var PeteqsHelper = {
 
     },
     exp_converter: function (linha) {
-        let conc = "";
-        let final = "";
 
+        PeteqsHelper.tokens.forEach(function(token){
+            
+            switch(token){
+                case ' mod ':
+                    linha = linha.replace(token,'%');
+                break;
+                case '=':
+                    linha = linha.replace(token,'==');
+                break;
+                case '<>':
+                    linha = linha.replace(token,'!=');
+                break;
+                default:
+                break;
+            }
+        })
         return linha;
     },
-    has_operator: function (line) {
-        let expressions = [];
-        this.tokens.forEach(function (token) {
-            if (line.includes(token)) {
-                expressions[token] = true;
-            }
-        });
+    has_modulo: function (line) {
 
-        return expressions;
-    },
-    separator_split: function (args) {
-
+        return line.match(PeteqsHelper.tokens[4]);
     },
     is_num: function (arg) {
         return !isNaN(parseInt(arg));
@@ -146,12 +156,12 @@ var PeteqsHelper = {
         else if (linha.match(PeteqsHelper.reserved_words[1])||linha.match(PeteqsHelper.reserved_words[2])){
             return PeteqsCore.fim(linha);
         }
-        else if (linha.match("imprima")){
-            return PeteqsCore.imprima(linha);
-        }
         else if (linha.match("imprimaln")){
             return PeteqsCore.imprimaln(linha);
         }
+        else if (linha.match("imprima")){
+            return PeteqsCore.imprima(linha);
+        }        
         else if (linha.match("leia")){
             return PeteqsCore.leia(linha);
         }
@@ -179,19 +189,22 @@ var PeteqsHelper = {
         
     },
     has_atribution: function (line) {
-        console.log(line);
         return line.match("<-");
     },
     execute: function (PQ_code) {
 
         let lines = PQ_code.split("\n");
         let code = "";
-        console.log(lines);
         for(var i = 0;i< lines.length;i++){
             code+= "\n" + PeteqsHelper.analyze(lines[i]);
         }
-
-        return eval(code);
+        try{
+            console.log(code);
+            return new Function(code)();
+        }
+        catch{
+            return "Existe um erro no código";
+        }
     }
 }
 
@@ -199,8 +212,9 @@ var linha =
 `início
 leia a
 para i<-1 até a faça
-i <- i + 1
-próximo i
-imprima a`;
+  se i mod 2 = 0
+    imprimaln i
+  fim se
+próximo i`;
 
 PeteqsHelper.execute(linha);
