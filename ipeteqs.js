@@ -20,10 +20,17 @@ const PeteqsCore = {
     imprimaln: function (args = '') {
         return PeteqsCore.imprima(args) + "print('\\n')";
     },
-    leia: function (args) {
-
+    leia: function (linha) {
+        linha = linha.substring(4,linha.length); //Remove o leia
+        
+        let variavel = linha;
+        
+        return `${variavel} = prompt('Insira o valor da variável');`
     },
     atribui: function (args) {
+        
+        args = PeteqsHelper.exp_converter(args);
+        
         return args.replace("<-","=");
     },
     se: function (cond) {
@@ -177,8 +184,8 @@ var PeteqsHelper = {
     },
     execute: function (PQ_code) {
 
-        lines = PQ_code.split("\n");
-        code = "";
+        let lines = PQ_code.split("\n");
+        let code = "";
         console.log(lines);
         for(var i = 0;i< lines.length;i++){
             code+= "\n" + PeteqsHelper.analyze(lines[i]);
@@ -188,11 +195,11 @@ var PeteqsHelper = {
     }
 }
 
-linha = 
+var linha = 
 `início
-a <- 0
-para i<-1 até 722 faça
-a <- a + 1
+leia a
+para i<-1 até a faça
+i <- i + 1
 próximo i
 imprima a`;
 
