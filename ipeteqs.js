@@ -68,8 +68,13 @@ const PeteqsCore = {
     procedimento: function (args) {
 
     },
-    enquanto: function (args) {
-
+    enquanto: function (cond) {
+        
+        cond = cond.replace(/enquanto/gi,"");
+        cond = cond.replace(/faça/gi,"");
+        
+        return "while(" + PeteqsHelper.exp_converter(cond) + "){";
+        
     },
     para: function (linha) {
         linha = linha.substr(4, linha.length - 4).trim();
@@ -165,31 +170,31 @@ var PeteqsHelper = {
         else if (linha.match(PeteqsHelper.reserved_words[1])||linha.match(PeteqsHelper.reserved_words[2])){
             return PeteqsCore.fim(linha);
         }
-        else if (linha.match("imprimaln")){
+        else if (linha.match(/imprimaln/gi)){
             return PeteqsCore.imprimaln(linha);
         }
-        else if (linha.match("imprima")){
+        else if (linha.match(/imprima/gi)){
             return PeteqsCore.imprima(linha);
         }        
-        else if (linha.match("leia")){
+        else if (linha.match(/leia/gi)){
             return PeteqsCore.leia(linha);
         }
-        else if (linha.match("senão")){
+        else if (linha.match(/senão/gi)){
             return PeteqsCore.senao(linha);
         }
-        else if (linha.match("se")){
+        else if (linha.match(/se/gi)){
             return PeteqsCore.se(linha);
         }        
-        else if (linha.match("para")){
+        else if (linha.match(/para/gi)){
             return PeteqsCore.para(linha);
         }
-        else if (linha.match("enquanto")){
+        else if (linha.match(/enquanto/gi)){
             return PeteqsCore.enquanto(linha);
         }
-        else if (linha.match("função")){
+        else if (linha.match(/função/gi)){
             return PeteqsCore.funcao(linha);
         }
-        else if (linha.match("procedimento")){
+        else if (linha.match(/procedimento/gi)){
             return PeteqsCore.procedimento(linha);
         }
         else{ //É um comentário
@@ -210,13 +215,14 @@ var PeteqsHelper = {
         try{
             if(target){
                 target.innerHTML = "";
+                console.log(code);
                 PQprint(target, eval(code));             
             }
             else{
                 return new Function(code)();
             }            
         }
-        catch{
+        catch(e){
             return PQprint(target,"Existe um erro no código");
         }
     }
@@ -231,6 +237,15 @@ para i<-1 até a faça
   senão
     imprimaln 'brasil'
   fim se
-próximo i`;
+próximo i
+
+a = 32
+
+enquanto a > 0 faça
+  imprimaln a
+  a = a - 1
+fim
+
+`;
 
 PeteqsHelper.execute(linha, document.getElementById('test'));
