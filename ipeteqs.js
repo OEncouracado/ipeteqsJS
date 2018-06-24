@@ -38,6 +38,10 @@ const PeteqsCore = {
         
         args = PeteqsHelper.exp_converter(args);
 
+        if(PeteqsHelper.has_vector(args)){
+            PeteqsHelper.checkAndCreateVector(args);
+        }
+
         return args.replace("<-","=");
     },
     se: function (cond) {
@@ -144,6 +148,24 @@ var PeteqsHelper = {
     has_modulo: function (line) {
 
         return line.match(PeteqsHelper.tokens[4]);
+    },
+    has_vector: function(line){
+
+        let regex = /\[.*\]/;
+
+        return line.match(regex);
+    },
+    checkAndCreateVector: function(line){
+
+        vectors = line.match(/[a-zA-Z0-9_]*(?=\[)/g);
+        
+        code = "";
+            
+        vectors.forEach(function(vector){
+            code+= `if(!=${vector}){${vector} = []}`;
+        })
+
+        return code;       
     },
     is_num: function (arg) {
         return !isNaN(parseInt(arg));
