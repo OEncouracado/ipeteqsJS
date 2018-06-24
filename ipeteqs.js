@@ -268,6 +268,12 @@ enquanto a > 0 faça
   a = a - 1
 fim
 
+a = 5
+
+para i<-1 até 5 faça
+  leia vetor[i]
+  imprimaln "O", i ,"simo valor do vetor é ", vetor[i]
+próximo i
 `;
 
 PeteqsHelper.execute(linha, document.getElementById('test'));
