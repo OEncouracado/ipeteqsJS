@@ -59,7 +59,7 @@ const PeteqsCore = {
         cond = cond.replace('senão', '');
 
         if (cond.match(/se/gi)) { //SENÃO SE var == Falso
-            cond = cond.substring(2)
+            cond.replace(/se/gi, "");
             cond = PeteqsCore.se(cond);
         }
         return cond ? "}else " + cond : "}else{";
@@ -102,7 +102,7 @@ const PeteqsCore = {
 }
 
 var PeteqsHelper = {
-    tokens: ["+", "-", "*", "/", " mod ", "<>", "="]
+    tokens: ["+", "-", "*", "/", " mod ", "<>", "=", " e ", " ou ", " não "]
     ,
     separators: ["(", ")", ","]
     ,
@@ -142,12 +142,21 @@ var PeteqsHelper = {
                 case '<>':
                     linha = linha.replace(token, '!=');
                     break;
+                case 'e':
+                    linha = linha.replace(token, '&&');
+                    break;
+                case 'ou':
+                    linha = linha.replace(token, '||');
+                    break;
+                case 'não':
+                    linha = linha.replace(token, '!');
+                    break;
                 default:
                     break;
             }
         })
         return linha;
-    },    
+    },
     handle_vectors: function (line) {
 
         if (PeteqsHelper.has_vector(line)) {
@@ -176,7 +185,7 @@ var PeteqsHelper = {
 
         vectors.forEach(function (vector) {
             if (vector) {
-                code += `if(alert(${vector} === undefined)){${vector} = Array("null")}`;
+                code += `if(typeof ${vector} === 'undefined' || !${vector}){${vector} = Array("null")}`;
             }
         })
 
