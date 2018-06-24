@@ -7,12 +7,12 @@
 
 var vars = [];
 
-//Assinatura da função PQPrint = PQPrint(target, arg1,arg2....argN)
-function PQprint(target){
+//Assinatura da função PQ_print = PQ_print(target, arg1,arg2....argN)
+function PQ_print(target) {
 
     //arguments[0] é target
-    for (var i=1; i < arguments.length; i++) {
-        if(arguments[i]){
+    for (var i = 1; i < arguments.length; i++) {
+        if (arguments[i]) {
             target.innerHTML += arguments[i];
         }
     }
@@ -21,34 +21,32 @@ function PQprint(target){
 
 const PeteqsCore = {
     imprima: function (args = '') {
-        let statement = PeteqsHelper.exp_converter(args.replace(/imprimaln|imprima/,''));
-        return `PQprint(target,${statement});`
+        let statement = PeteqsHelper.exp_converter(args.replace(/imprimaln|imprima/, ''));
+        return `PQ_print(target,${statement});`
     },
     imprimaln: function (args = '') {
-        return PeteqsCore.imprima(args) + "\nPQprint(target,'<br>')";
+        return PeteqsCore.imprima(args) + "\nPQ_print(target,'<br>')";
     },
     leia: function (linha) {
-        linha = linha.substring(4,linha.length); //Remove o leia
-        
-        let variavel = linha;
-        
+        linha = linha.substring(4, linha.length); //Remove o leia
+
+        let variavel = PeteqsHelper.handle_vectors(linha);
+
         return `${variavel} = prompt('Insira o valor da variável');`
     },
     atribui: function (args) {
-        
+
         args = PeteqsHelper.exp_converter(args);
 
-        if(PeteqsHelper.has_vector(args)){
-            PeteqsHelper.checkAndCreateVector(args);
-        }
+        args = PeteqsHelper.handle_vectors(args);
 
-        return args.replace("<-","=");
+        return args.replace("<-", "=");
     },
     se: function (cond) {
         //Ex.: SE Var = Verdadeiro ENTÃO
         cond = cond.replace(/SE/gi, '');
 
-        if(cond.match(/Então/gi)){
+        if (cond.match(/Então/gi)) {
             cond = cond.substring(0, -6)
         }
         cond = cond.trim();
@@ -58,9 +56,9 @@ const PeteqsCore = {
         return `if(${cond}){`;
     },
     senao: function (cond = '') {
-        cond = cond.replace('senão','');
+        cond = cond.replace('senão', '');
 
-        if (cond.trim().substring(0, 1) == 'se') { //SENÃO SE var == Falso
+        if (cond.match(/se/gi)) { //SENÃO SE var == Falso
             cond = cond.substring(2)
             cond = PeteqsCore.se(cond);
         }
@@ -73,12 +71,12 @@ const PeteqsCore = {
 
     },
     enquanto: function (cond) {
-        
-        cond = cond.replace(/enquanto/gi,"");
-        cond = cond.replace(/faça/gi,"");
-        
+
+        cond = cond.replace(/enquanto/gi, "");
+        cond = cond.replace(/faça/gi, "");
+
         return "while(" + PeteqsHelper.exp_converter(cond) + "){";
-        
+
     },
     para: function (linha) {
         linha = linha.substr(4, linha.length - 4).trim();
@@ -104,7 +102,7 @@ const PeteqsCore = {
 }
 
 var PeteqsHelper = {
-    tokens: ["+", "-", "*", "/", " mod ","<>","="]
+    tokens: ["+", "-", "*", "/", " mod ", "<>", "="]
     ,
     separators: ["(", ")", ","]
     ,
@@ -132,45 +130,57 @@ var PeteqsHelper = {
     },
     exp_converter: function (linha) {
 
-        PeteqsHelper.tokens.forEach(function(token){
-            
-            switch(token){
+        PeteqsHelper.tokens.forEach(function (token) {
+
+            switch (token) {
                 case ' mod ':
-                    linha = linha.replace(token,'%');
-                break;
+                    linha = linha.replace(token, '%');
+                    break;
                 case '=':
-                    linha = linha.replace(token,'==');
-                break;
+                    linha = linha.replace(token, '==');
+                    break;
                 case '<>':
-                    linha = linha.replace(token,'!=');
-                break;
+                    linha = linha.replace(token, '!=');
+                    break;
                 default:
-                break;
+                    break;
             }
         })
         return linha;
-    },
-    has_modulo: function (line) {
+    },    
+    handle_vectors: function (line) {
 
-        return line.match(PeteqsHelper.tokens[4]);
+        if (PeteqsHelper.has_vector(line)) {
+            line = PeteqsHelper.vector_exists_check(line) + line;
+        }
+        return line;
     },
-    has_vector: function(line){
+    has_vector: function (line) {
 
         let regex = /\[.*\]/;
 
         return line.match(regex);
     },
-    checkAndCreateVector: function(line){
+    has_atribution: function (line) {
+        return line.match("<-");
+    },
+    has_modulo: function (line) {
+
+        return line.match(PeteqsHelper.tokens[4]);
+    },
+    vector_exists_check: function (line) {
 
         vectors = line.match(/[a-zA-Z0-9_]*(?=\[)/g);
-        
+
         code = "";
-            
-        vectors.forEach(function(vector){
-            code+= `if(!=${vector}){${vector} = []}`;
+
+        vectors.forEach(function (vector) {
+            if (vector) {
+                code += `if(alert(${vector} === undefined)){${vector} = Array("null")}`;
+            }
         })
 
-        return code;       
+        return code;
     },
     is_num: function (arg) {
         return !isNaN(parseInt(arg));
@@ -189,82 +199,79 @@ var PeteqsHelper = {
         else if (linha.match(PeteqsHelper.reserved_words[0])) {
             return '//Início';
         }
-        else if (linha.match(PeteqsHelper.reserved_words[1])||linha.match(PeteqsHelper.reserved_words[2])){
+        else if (linha.match(PeteqsHelper.reserved_words[1]) || linha.match(PeteqsHelper.reserved_words[2])) {
             return PeteqsCore.fim(linha);
         }
-        else if (linha.match(/imprimaln/gi)){
+        else if (linha.match(/imprimaln/gi)) {
             return PeteqsCore.imprimaln(linha);
         }
-        else if (linha.match(/imprima/gi)){
+        else if (linha.match(/imprima/gi)) {
             return PeteqsCore.imprima(linha);
-        }        
-        else if (linha.match(/leia/gi)){
+        }
+        else if (linha.match(/leia/gi)) {
             return PeteqsCore.leia(linha);
         }
-        else if (linha.match(/senão/gi)){
+        else if (linha.match(/senão/gi)) {
             return PeteqsCore.senao(linha);
         }
-        else if (linha.match(/se/gi)){
+        else if (linha.match(/se/gi)) {
             return PeteqsCore.se(linha);
-        }        
-        else if (linha.match(/para/gi)){
+        }
+        else if (linha.match(/para/gi)) {
             return PeteqsCore.para(linha);
         }
-        else if (linha.match(/enquanto/gi)){
+        else if (linha.match(/enquanto/gi)) {
             return PeteqsCore.enquanto(linha);
         }
-        else if (linha.match(/função/gi)){
+        else if (linha.match(/função/gi)) {
             return PeteqsCore.funcao(linha);
         }
-        else if (linha.match(/procedimento/gi)){
+        else if (linha.match(/procedimento/gi)) {
             return PeteqsCore.procedimento(linha);
         }
-        else{ //É um comentário
+        else { //É um comentário
             return linha;
         }
-        
-    },
-    has_atribution: function (line) {
-        return line.match("<-");
+
     },
     execute: function (PQ_code, target) {
 
         let lines = PQ_code.split("\n");
         let code = "";
-        for(var i = 0;i< lines.length;i++){
-            code+= "\n" + PeteqsHelper.analyze(lines[i]);
+        for (var i = 0; i < lines.length; i++) {
+            code += "\n" + PeteqsHelper.analyze(lines[i]);
         }
-        try{
-            if(target){
+        try {
+            if (target) {
                 target.innerHTML = "";
                 console.log(code);
-                PQprint(target, eval(code));             
+                PQ_print(target, eval(code));
             }
-            else{
+            else {
                 return new Function(code)();
-            }            
+            }
         }
-        catch(e){
-            return PQprint(target,"Existe um erro no código");
+        catch (e) {
+            return PQ_print(target, "<br>Existe um erro no código", "<hr>", e);
         }
     }
 }
 
-var linha = 
-`início
+var linha =
+    `início
 leia a
 para i<-1 até a faça
   se i mod 2 = 0
     imprimaln i,'-- par'
-  senão
+  senão se i mod 3 = 0
     imprimaln 'brasil'
   fim se
 próximo i
 
-a = 32
+a = 3
 
 enquanto a > 0 faça
-  imprimaln a
+  imprimaln 'Contando...', a
   a = a - 1
 fim
 
