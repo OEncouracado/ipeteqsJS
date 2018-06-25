@@ -66,8 +66,16 @@ const PeteqsCore = {
     },
     funcao: function (args) {
 
+
+
     },
     procedimento: function (args) {
+
+        nome = args.replace(/procedimento/gi, "");
+
+        PeteqsHelper.in_function = true;
+
+        return `function ${nome}(){`
 
     },
     enquanto: function (cond) {
@@ -93,15 +101,17 @@ const PeteqsCore = {
 
         return PeteqsHelper.ptq_para(args);
     },
-    fim: function () {
-        if (PeteqsHelper.in_function) {
+    fim: function (varname = '') {
+
+        if (PeteqsHelper.in_function && PeteqsHelper.has_atribution(varname)) {
             PeteqsHelper.in_function = false;
+            return `return ${varname} ; }`
         }
         return "}";
     }
 }
 
-var PeteqsHelper = {
+const PeteqsHelper = {
     tokens: ["+", "-", "*", "/", " mod ", "<>", "=", " e ", " ou ", " não "]
     ,
     separators: ["(", ")", ","]
@@ -142,13 +152,13 @@ var PeteqsHelper = {
                 case '<>':
                     linha = linha.replace(token, '!=');
                     break;
-                case 'e':
+                case ' e ':
                     linha = linha.replace(token, '&&');
                     break;
-                case 'ou':
+                case ' ou ':
                     linha = linha.replace(token, '||');
                     break;
-                case 'não':
+                case ' não ':
                     linha = linha.replace(token, '!');
                     break;
                 default:
@@ -238,7 +248,16 @@ var PeteqsHelper = {
         else if (linha.match(/procedimento/gi)) {
             return PeteqsCore.procedimento(linha);
         }
-        else { //É um comentário
+        else if (linha.match("//")) {
+            return linha; //Comentário
+        }
+        else { //É uma chamada de procedimento
+            if (linha != "" && !PeteqsHelper.has_atribution(linha)) {
+                return `if (typeof ${linha} === 'function') {
+                    ${linha}();
+                }
+                `
+            }
             return linha;
         }
 
@@ -277,19 +296,20 @@ para i<-1 até a faça
   fim se
 próximo i
 
-a = 3
+a = 2
 
 enquanto a > 0 faça
   imprimaln 'Contando...', a
+  levetor
   a = a - 1
 fim
 
-a = 5
-
-para i<-1 até 5 faça
-  leia vetor[i]
-  imprimaln "O", i ,"simo valor do vetor é ", vetor[i]
-próximo i
+procedimento levetor
+  para i<-1 até 5 faça
+    leia vetor[i]
+    imprimaln "O ", i ,"simo valor do vetor é ", vetor[i]
+  próximo i
+fim
 `;
 
-PeteqsHelper.execute(linha, document.getElementById('test'));
+PeteqsHelper.execute(linha, document.querySelector('body'));
