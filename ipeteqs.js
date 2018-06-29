@@ -19,7 +19,7 @@ function PQ_print(target) {
 
 }
 
-const PeteqsCore = {
+var PeteqsCore = {
     imprima: function (args = '') {
         let statement = PeteqsHelper.exp_converter(args.replace(/imprimaln|imprima/, ''));
         return `PQ_print(target,${statement});`
@@ -30,9 +30,13 @@ const PeteqsCore = {
     leia: function (linha) {
         linha = linha.substring(4, linha.length); //Remove o leia
 
+        //Verifica a existência de um vetor e o inicializa caso não exista.
         let variavel = PeteqsHelper.handle_vectors(linha);
-
-        return `${variavel} = prompt('Insira o valor da variável');`
+        if(PeteqsHelper.has_vector(linha)){
+            return `${variavel} = prompt('Insira o valor da variável do vetor');`;
+        }
+        return `${variavel} = prompt('Insira o valor da variável ${variavel}');`;
+        // 
     },
     atribui: function (args) {
 
@@ -66,7 +70,27 @@ const PeteqsCore = {
     },
     funcao: function (args) {
 
+        PeteqsHelper.in_function = true;
 
+        let regex = /(\S+(?=\())(\(.*\))/;
+        
+        let assinatura = args.match(regex);
+        
+        let nome = assinatura[1];
+        
+        let param = function(args){
+            args = args.replace(/entradas?:/gi,"");
+            args = args.split(/sa[íi]da[s?]:/gi);
+            
+            let saidas = args[1].trim().slice(0,-1);
+            let entradas = args[0].trim().slice(1,-1);
+            
+            return {'entradas':entradas,'saidas':saidas};
+        }(assinatura[2]);
+        
+        return `function ${nome}(${param.entradas}){
+            let ${param.saidas};
+            `        
 
     },
     procedimento: function (args) {
@@ -92,8 +116,8 @@ const PeteqsCore = {
         let args = (function () {
             let split_linha = linha.split('<-');
             let variavel = split_linha[0].trim();
-            let min = split_linha[1].match('[0-9]*.')[0]; //O número é o unico grupo de captura
-            let max = split_linha[1].match('(ATÉ|até) ([0-9]*.)')[2]; //O número é o segundo grupo capturado
+            let min = split_linha[1].match(/[0-9]*./)[0]; //O número é o unico grupo de captura
+            let max = split_linha[1].match(/(ATÉ|até) ([0-9]*.)/)[2]; //O número é o segundo grupo capturado
 
 
             return [variavel, min, max];
@@ -111,7 +135,7 @@ const PeteqsCore = {
     }
 }
 
-const PeteqsHelper = {
+var PeteqsHelper = {
     tokens: ["+", "-", "*", "/", " mod ", "<>", "=", " e ", " ou ", " não "]
     ,
     separators: ["(", ")", ","]
@@ -208,7 +232,7 @@ const PeteqsHelper = {
         linha = linha.trim();
 
         if (PeteqsHelper.has_atribution(linha)) {
-            if (linha.match('para|PARA')) {
+            if (linha.match(/para|PARA/)) {
                 return PeteqsCore.para(linha);
             }
             else {
@@ -253,7 +277,7 @@ const PeteqsHelper = {
         }
         else { //É uma chamada de procedimento
             if (linha != "" && !PeteqsHelper.has_atribution(linha)) {
-                return `if (typeof ${linha} === 'function') {
+                return `if (typeof (${linha}) === 'function') {
                     ${linha}();
                 }
                 `
