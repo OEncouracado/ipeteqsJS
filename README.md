@@ -9,7 +9,7 @@ Especificamente na UFF. Um problema para os iniciantes é que não há como exec
 Este é um interpretador da linguagem que funciona baseado em tradução para uma linguagem real e execução.
 Ele é escrito em ruby, tanto o tradutor como a linguagem-destino.
 
-##Ipeteqs em Javascript?
+## Ipeteqs em Javascript?
 
 Visando a possibilidade de executar PETEQS em qualquer lugar, ipeteqs foi portado para Javascript. Assim como o interpretador original, ele traduz a linguagem PETEQS para uma linguagem real e a executa, sendo escrito  em Javascript ambos o tradutor e o código traduzido.
 
