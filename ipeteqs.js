@@ -85,8 +85,8 @@ const PeteqsCore = {
             args = args.replace(/entradas?:/gi,"");
             args = args.split(/sa[íi]da[s?]:/gi);
             
-            let saidas = args[1].trim().slice(0,-1);
-            let entradas = args[0].trim().slice(1,-1);
+            let saidas = args[1].trim().slice(0,-1) || null;
+            let entradas = args[0].trim().slice(1,-1) || null;
             
             return {'entradas':entradas,'saidas':saidas};
         }(assinatura[2]);
