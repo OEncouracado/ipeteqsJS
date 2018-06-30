@@ -129,7 +129,7 @@ const PeteqsCore = {
         let args = (function () {
             let split_linha = linha.split('<-');
             let variavel = split_linha[0].trim();
-            let min = split_linha[1].match(/[0-9]*./)[0]; //O número é o unico grupo de captura
+            let min = split_linha[1].trim().match(/[0-9]*./)[0]; //O número é o unico grupo de captura
             let max = split_linha[1].match(/(ATÉ|até) ([0-9]*.)/)[2]; //O número é o segundo grupo capturado
             
             console.log(split_linha);
