@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<head>
+  <title>VisuHTML - Visualize seu HTML</title>
+
+  <meta charset="utf-8"></meta>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css"/> 
+</head>
+<body>
+  <div class="row">
+    <div class="col">
+      <textarea id="codearea" name='input'></textarea>
+      <button class="btn btn-success"
+      onclick="PeteqsHelper.execute(document.querySelector('#codearea').value,document.querySelector('#visualizacao'))">
+      EXECUTAR
+    </button>
+      </div>
+    <div class="col">
+        <div id="visualizacao">
+
+        </div>
+      </div>
+  </div>
+
+  <script src="ipeteqs.js"></script>
+</body>

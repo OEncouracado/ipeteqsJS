@@ -5,10 +5,13 @@
  * @author leon de frança nascimento
  */
 
-var vars = [];
-
+var innerCounter = 0;
 //Assinatura da função PQ_print = PQ_print(target, arg1,arg2....argN)
 function PQ_print(target) {
+
+    if(innerCounter > 99999){
+        debugger;
+    }
 
     //arguments[0] é target
     for (var i = 1; i < arguments.length; i++) {
@@ -19,7 +22,7 @@ function PQ_print(target) {
 
 }
 
-var PeteqsCore = {
+const PeteqsCore = {
     imprima: function (args = '') {
         let statement = PeteqsHelper.exp_converter(args.replace(/imprimaln|imprima/, ''));
         return `PQ_print(target,${statement});`
@@ -50,8 +53,8 @@ var PeteqsCore = {
         //Ex.: SE Var = Verdadeiro ENTÃO
         cond = cond.replace(/SE/gi, '');
 
-        if (cond.match(/Então/gi)) {
-            cond = cond.substring(0, -6)
+        if (cond.match(/então/gi)) {
+            cond = cond.replace(/então/gi,"");
         }
         cond = cond.trim();
 
@@ -87,6 +90,8 @@ var PeteqsCore = {
             
             return {'entradas':entradas,'saidas':saidas};
         }(assinatura[2]);
+
+        PeteqsHelper.vars.push(param.saidas.split(","));
         
         return `function ${nome}(${param.entradas}){
             let ${param.saidas};
@@ -107,7 +112,15 @@ var PeteqsCore = {
         cond = cond.replace(/enquanto/gi, "");
         cond = cond.replace(/faça/gi, "");
 
-        return "while(" + PeteqsHelper.exp_converter(cond) + "){";
+        return `
+            loopStart = Date.now();
+            while(${PeteqsHelper.exp_converter(cond)}){
+                if(Date.now() - loopStart > 10000){
+                    PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
+                    break;
+                }
+            
+            `;
 
     },
     para: function (linha) {
@@ -118,29 +131,33 @@ var PeteqsCore = {
             let variavel = split_linha[0].trim();
             let min = split_linha[1].match(/[0-9]*./)[0]; //O número é o unico grupo de captura
             let max = split_linha[1].match(/(ATÉ|até) ([0-9]*.)/)[2]; //O número é o segundo grupo capturado
-
-
+            
+            console.log(split_linha);
+            
             return [variavel, min, max];
         })();
-
+        
         return PeteqsHelper.ptq_para(args);
     },
-    fim: function (varname = '') {
+    fim: function (linha) {
 
-        if (PeteqsHelper.in_function && PeteqsHelper.has_atribution(varname)) {
+        if (PeteqsHelper.in_function && !linha.match(/para|se|enquanto/gi)) {
             PeteqsHelper.in_function = false;
-            return `return ${varname} ; }`
+            conversion = `${PeteqsHelper.vars[PeteqsHelper.vars.length-1]}= resultado;`
+            return `${conversion}\nreturn ${PeteqsHelper.vars.pop()} ; }`
         }
         return "}";
     }
 }
 
-var PeteqsHelper = {
-    tokens: ["+", "-", "*", "/", " mod ", "<>", "=", " e ", " ou ", " não "]
+const PeteqsHelper = {
+    vars: []
+    ,
+    tokens: [" + ", " - ", " * ", " / ", " mod ", " <> ", " = ", " E ", " OU ", " NÃO ", /verdadeiro/gi, /falso/gi]
     ,
     separators: ["(", ")", ","]
     ,
-    reserved_words: ['início', 'fim', 'próximo', 'senão', 'função']
+    reserved_words: [/início/gi, /fim/gi, /pr[óo]ximo/gi, /senão/gi, /função/gi]
     ,
     in_function: false
     ,
@@ -153,11 +170,25 @@ var PeteqsHelper = {
         let code = "";
 
         if (fim < começo) {
-            code = `for(var ${variavel} = ${começo}; ${variavel}>= ${fim};${variavel}--){`;
+            code = `
+            loopStart = Date.now();
+            for(var ${variavel} = ${começo}; ${variavel}>= ${fim};${variavel}--){
+                if(Date.now() - loopStart > 10000){
+                    PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
+                    break;
+                }
+                `;
             return
         }
         else {
-            code = `for(var ${variavel} = ${começo}; ${variavel}<= ${fim};${variavel}++){`;
+            code = `
+            loopStart = Date.now();
+            for(var ${variavel} = ${começo}; ${variavel}<= ${fim};${variavel}++){
+                if(Date.now() - loopStart > 10000){
+                    PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
+                    break;
+                }
+                `;
             return code;
         }
 
@@ -170,21 +201,27 @@ var PeteqsHelper = {
                 case ' mod ':
                     linha = linha.replace(token, '%');
                     break;
-                case '=':
+                case ' = ':
                     linha = linha.replace(token, '==');
                     break;
-                case '<>':
+                case ' <> ':
                     linha = linha.replace(token, '!=');
                     break;
-                case ' e ':
+                case ' E ':
                     linha = linha.replace(token, '&&');
                     break;
-                case ' ou ':
+                case ' OU ':
                     linha = linha.replace(token, '||');
                     break;
-                case ' não ':
+                case ' NÃO ':
                     linha = linha.replace(token, '!');
                     break;
+                case 'VERDADEIRO':
+                    linha = linha.replace(token, 'True');
+                break;
+                case 'FALSO':
+                    linha = linha.replace(token, 'False');
+                break;
                 default:
                     break;
             }
@@ -309,7 +346,7 @@ var PeteqsHelper = {
     }
 }
 
-var linha =
+var test1 =
     `início
 leia a
 para i<-1 até a faça
@@ -336,4 +373,17 @@ procedimento levetor
 fim
 `;
 
-PeteqsHelper.execute(linha, document.querySelector('body'));
+var test2 = `
+função teste(entradas: altura, peso, saídas: IMC)
+início
+  resultado <- peso / (altura * altura )
+fim
+
+peso <- 100
+altura <- 1.60
+imprimaln 'O peso do gordo é de ', peso , 'kg. e sua altura é de ', altura
+imprimaln 'Seu IMC é de ', teste(altura, peso)
+
+imprima 'IMC + Peso = ', 100+teste(altura,peso)
+
+`;
