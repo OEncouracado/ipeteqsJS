@@ -222,24 +222,24 @@ const PeteqsCore = {
              ${variavel} = ${começo};
              if(${fim}>${começo}){
                increment = true;   
-               var condition = '${variavel} < ${fim}';
+               var condition = '${variavel} <= ${fim}';
                
               }
               else{
                 increment =  false;
-                var condition = '${variavel} > ${fim}';
+                var condition = '${variavel} >= ${fim}';
               }
              while(true){
              if(Date.now() - loopStart > 30000){
                         PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
                         break;
                     }
-              if(${variavel}){
+              if(increment){
                 ${variavel} = ${variavel} + 1;
               }else{
                 ${variavel} = ${variavel} -1;
               }
-              if(eval(condition)){
+              if(!eval(condition)){
                  break;
               }`
         }
