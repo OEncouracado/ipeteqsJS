@@ -52,7 +52,7 @@ const PeteqsCore = {
     },
     se: function (cond) {
         //Ex.: SE Var = Verdadeiro ENTÃO
-        cond = cond.replace(/SE/gi, '');
+        cond = cond.replace(/se/gi, '');
 
         if (cond.match(/então/gi)) {
             cond = cond.replace(/então/gi,"");
@@ -133,8 +133,8 @@ const PeteqsCore = {
         let args = (function () {
             let split_linha = linha.split('<-');
             let variavel = split_linha[0].trim();
-            let min = split_linha[1].trim().match(/[0-9]*./)[0]; //O número é o unico grupo de captura
-            let max = split_linha[1].match(/(ATÉ|até) ([0-9]*.)/)[2]; //O número é o segundo grupo capturado
+            let min = split_linha[1].trim().match(/.*(?=ATÉ|até]*)/)[0]; //O número é o unico grupo de captura
+            let max = split_linha[1].replace(/(ATÉ|até)/,"").replace(/faça/gi,"").replace(min,""); //O número é o segundo grupo capturado
             
             console.log(split_linha);
             
@@ -145,8 +145,9 @@ const PeteqsCore = {
     },
     fim: function (linha) {
 
-        if (PeteqsHelper.in_function && !linha.match(/para|se|enquanto/gi)) {
+        if (PeteqsHelper.in_function && !linha.match(/para|se|enquanto|pr[oó]ximo/gi)) {
             PeteqsHelper.in_function = false;
+            
             if(PeteqsHelper.vars.length>0){
               let conversion = `${PeteqsHelper.vars[PeteqsHelper.vars.length-1]}= resultado;`
               return `${conversion}
@@ -163,11 +164,11 @@ const PeteqsCore = {
 const PeteqsHelper = {
     vars: []
     ,
-    tokens: [" + ", " - ", " * ", "/", ' mod ', " <> ", " = ", " E ", " OU ", " NÃO ", /verdadeiro/gi, /falso/gi]
+    tokens: [" + ", " - ", " * ", "/", ' mod ', " <> ", " = ", " E ", " OU ", " NÃO ", 'VERDADEIRO', 'FALSO']
     ,
     separators: ["(", ")", ","]
     ,
-    reserved_words: [/início/gi, /fim/gi, /pr[óo]ximo/gi, /senão/gi, /função/gi]
+    reserved_words: [/início/gi, /fim/gi, /pr[óo]ximo/gi, /senão/gi, /função/gi,/programa/gi,]
     ,
     in_function: false
     ,
@@ -178,30 +179,55 @@ const PeteqsHelper = {
         let fim = variaveis[2];
 
         let code = "";
-
-        if (fim < começo) {
-            code = `
-            loopStart = Date.now();
-            for(var ${variavel} = ${começo}; ${variavel}>= ${fim};${variavel}--){
-                if(Date.now() - loopStart > 10000){
-                    PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
-                    break;
-                }
-                `;
-            return code;
+        
+        if(PeteqsHelper.is_num(fim) && PeteqsHelper.is_num(fim)){
+            if (fim < começo) {
+                code = `
+                loopStart = Date.now();
+                for(var ${variavel} = ${fim}; ${variavel}>= ${começo};${variavel}--){
+                    if(Date.now() - loopStart > 10000){
+                        PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
+                        break;
+                    }
+                    `;
+                
+            }
+            else {
+                code = `
+                loopStart = Date.now();
+                for(var ${variavel} = ${começo}; ${variavel}<= ${fim};${variavel}++){
+                    if(Date.now() - loopStart > 10000){
+                        PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
+                        break;
+                    }
+                    `;
+               
+            }
         }
-        else {
-            code = `
-            loopStart = Date.now();
-            for(var ${variavel} = ${começo}; ${variavel}<= ${fim};${variavel}++){
-                if(Date.now() - loopStart > 10000){
-                    PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
-                    break;
-                }
-                `;
-            return code;
+        else{
+             code = `
+             loopStart = Date.now();
+             ${variavel} = ${começo};
+             if(${fim}>${começo}){
+               increment = true;   
+               var condition = '${variavel} < ${fim}';
+               
+              }
+              else{
+                increment =  false;
+                var condition = '${variavel} > ${fim}';
+              }
+             while(true){
+             if(Date.now() - loopStart > 10000){
+                        PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
+                        break;
+                    }
+              ${variavel} = increment ? ++${variavel}:--${variavel};
+              if(eval(condition)){
+                 break;
+              }`
         }
-
+        return code;
     },
     exp_converter: function (linha) {
 
@@ -232,10 +258,10 @@ const PeteqsHelper = {
                     linha = linha.replace(token, '!');
                     break;
                 case 'VERDADEIRO':
-                    linha = linha.replace(token, 'True');
+                    linha = linha.replace(/verdadeiro/gi, 'true');
                 break;
                 case 'FALSO':
-                    linha = linha.replace(token, 'False');
+                    linha = linha.replace(/falso/gi, 'false');
                 break;
                 default:
                     break;
@@ -360,45 +386,3 @@ const PeteqsHelper = {
         }
     }
 }
-
-var test1 =
-    `início
-leia a
-para i<-1 até a faça
-  se i mod 2 = 0
-    imprimaln i,'-- par'
-  senão se i mod 3 = 0
-    imprimaln 'brasil'
-  fim se
-próximo i
-
-a = 2
-
-enquanto a > 0 faça
-  imprimaln 'Contando...', a
-  levetor
-  a = a - 1
-fim
-
-procedimento levetor
-  para i<-1 até 5 faça
-    leia vetor[i]
-    imprimaln "O ", i ,"simo valor do vetor é ", vetor[i]
-  próximo i
-fim
-`;
-
-var test2 = `
-função teste(entradas: altura, peso, saídas: IMC)
-início
-  resultado <- peso / (altura * altura )
-fim
-
-peso <- 100
-altura <- 1.60
-imprimaln 'O peso do gordo é de ', peso , 'kg. e sua altura é de ', altura
-imprimaln 'Seu IMC é de ', teste(altura, peso)
-
-imprima 'IMC + Peso = ', 100+teste(altura,peso)
-
-`;

@@ -23,6 +23,7 @@ body > div{
 }
 
 #codearea{
+  font-family:monospace;
   width:100%;
   height:80vh;
 }
