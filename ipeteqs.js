@@ -5,18 +5,19 @@
  * @author leon de frança nascimento
  */
 
-var innerCounter = 0;
+
 //Assinatura da função PQ_print = PQ_print(target, arg1,arg2....argN)
 function PQ_print(target) {
-
-    if(innerCounter > 99999){
-        debugger;
-    }
-
+    
     //arguments[0] é target
     for (var i = 1; i < arguments.length; i++) {
         if (arguments[i]) {
+            if(isNaN(Number(arguments[i]))){
             target.innerHTML += arguments[i];
+            }
+            else{
+                target.innerHTML += Number(arguments[i]);
+            }
         }
     }
 
@@ -85,10 +86,13 @@ const PeteqsCore = {
             args = args.replace(/entradas?:/gi,"");
             args = args.split(/sa[íi]da[s?]:/gi);
             
-            let saidas = args[1].trim().slice(0,-1) || null;
-            let entradas = args[0].trim().slice(1,-1) || null;
+            let entradas = args[0].trim().slice(1,-1);    
             
-            return {'entradas':entradas,'saidas':saidas};
+            let saidas = args[1] != null ? args[1].trim().slice(0,-1) : 'a';
+            
+            
+            return {'entradas':entradas,'saidas':saidas};    
+           
         }(assinatura[2]);
 
         PeteqsHelper.vars.push(param.saidas.split(","));
@@ -143,8 +147,14 @@ const PeteqsCore = {
 
         if (PeteqsHelper.in_function && !linha.match(/para|se|enquanto/gi)) {
             PeteqsHelper.in_function = false;
-            conversion = `${PeteqsHelper.vars[PeteqsHelper.vars.length-1]}= resultado;`
-            return `${conversion}\nreturn ${PeteqsHelper.vars.pop()} ; }`
+            if(PeteqsHelper.vars.length>0){
+              let conversion = `${PeteqsHelper.vars[PeteqsHelper.vars.length-1]}= resultado;`
+              return `${conversion}
+              return ${PeteqsHelper.vars.pop()} ; }`
+            }
+            else{
+                return "}";
+            }
         }
         return "}";
     }
@@ -153,7 +163,7 @@ const PeteqsCore = {
 const PeteqsHelper = {
     vars: []
     ,
-    tokens: [" + ", " - ", " * ", " / ", " mod ", " <> ", " = ", " E ", " OU ", " NÃO ", /verdadeiro/gi, /falso/gi]
+    tokens: [" + ", " - ", " * ", "/", ' mod ', " <> ", " = ", " E ", " OU ", " NÃO ", /verdadeiro/gi, /falso/gi]
     ,
     separators: ["(", ")", ","]
     ,
@@ -178,7 +188,7 @@ const PeteqsHelper = {
                     break;
                 }
                 `;
-            return
+            return code;
         }
         else {
             code = `
@@ -198,8 +208,13 @@ const PeteqsHelper = {
         PeteqsHelper.tokens.forEach(function (token) {
 
             switch (token) {
+                case '/':
+                    if(linha.match("/")){
+                        linha = linha += ">> 0;";
+                    }
+                    break;
                 case ' mod ':
-                    linha = linha.replace(token, '%');
+                    linha = linha.replace(/mod/gi, '%');
                     break;
                 case ' = ':
                     linha = linha.replace(token, '==');
