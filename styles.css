@@ -20,6 +20,7 @@ body > div{
   overflow-y:scroll;
   word-wrap:break-word;
   padding:0.5em;
+  font-family:monospace;
 }
 
 #codearea{

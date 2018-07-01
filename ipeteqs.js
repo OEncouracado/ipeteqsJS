@@ -16,21 +16,46 @@ function PQ_print(target) {
             target.innerHTML += arguments[i];
             }
             else{
-                target.innerHTML += Number(arguments[i]);
+                target.innerHTML += arguments[i];
             }
         }
     }
 
 }
 
+/**
+ * Núcleo da funcionalidade do PETEQS
+ * 
+ * Após as funções serem idenficadas pelo Helper, o PeteqsCore faz a identificação e separação dos tokens
+ * e em seguida gera código Javascript equivalente.
+ * 
+ * Nas funções de repetição, como enquanto e para, embute-se um código salvaguarda para loops infinitos, que
+ * verifica se um determinado loop está rodando a mais de 10 segundos e o para caso a execução demore demais.
+ * 
+ */ 
 const PeteqsCore = {
+    /**
+    * Função de impressão:Converte a expressão a ser imprimida pela função PQ_print em uma
+    * expressão válida para o Javascript através da função exp_converter, retornando a chamada 
+    * em javascript
+    */
     imprima: function (args = '') {
         let statement = PeteqsHelper.exp_converter(args.replace(/imprimaln|imprima/, ''));
         return `PQ_print(target,${statement});`
     },
+    /**
+    * Função de impressão com nova linha:Converte a expressão a ser imprimida pela 
+    * função PQ_print em uma em javascript e usa a função imprima, em seguida imprime
+    * uma nova linha em branco.
+    */
     imprimaln: function (args = '') {
         return PeteqsCore.imprima(args) + "\nPQ_print(target,'<br>')";
     },
+    /**
+    * Função de entrada: Remove os tokens sintáticos do PETEQS e identifica o nome da variável.
+    * Caso a variável seja um vetor, tenta criar um vetor se este não existir.
+    * 
+    */
     leia: function (linha) {
         linha = linha.substring(4, linha.length); //Remove o leia
 
@@ -39,9 +64,18 @@ const PeteqsCore = {
         if(PeteqsHelper.has_vector(linha)){
             return `${variavel} = prompt('Insira o valor da variável do vetor');`;
         }
-        return `${variavel} = prompt('Insira o valor da variável ${variavel}');`;
-        // 
+        
+        //Javascript faz typecasting pra string na função prompt. Aqui garantimos que os números sejam números
+        return `${variavel} = prompt('Insira o valor da variável ${variavel}');
+        if(!isNaN(${variavel})){
+            ${variavel} = Number(${variavel})
+        }`;
     },
+    /**
+     * Função de atribuição: Substitui as expressões PETEQS por expressões javascript,
+     * lida com vetores e substitui o operador de atribuição pelo operador de atribuição 
+     * do Javascript
+     */
     atribui: function (args) {
 
         args = PeteqsHelper.exp_converter(args);
@@ -50,6 +84,9 @@ const PeteqsCore = {
 
         return args.replace("<-", "=");
     },
+    /**
+     * Função condicional: Separa os tokens PETEQS e retorna uma desvio de fluxo em Javascript.
+     */
     se: function (cond) {
         //Ex.: SE Var = Verdadeiro ENTÃO
         cond = cond.replace(/se/gi, '');
@@ -63,6 +100,11 @@ const PeteqsCore = {
 
         return `if(${cond}){`;
     },
+    /**
+     * Função condicional: Separa os tokens PETEQS e retorna uma desvio opcional em javascript
+     * 
+     * Equivale às estruturas ELSE e ELSE IF do Javascript.
+     */
     senao: function (cond = '') {
         cond = cond.replace('senão', '');
 
@@ -70,6 +112,7 @@ const PeteqsCore = {
             cond.replace(/se/gi, "");
             cond = PeteqsCore.se(cond);
         }
+        //Se tiver uma condição (else if), retorna esta estrutura; caso contrario, somente retorna Else.
         return cond ? "}else " + cond : "}else{";
     },
     funcao: function (args) {
@@ -98,13 +141,11 @@ const PeteqsCore = {
         PeteqsHelper.vars.push(param.saidas.split(","));
         
         return `function ${nome}(${param.entradas}){
-            let ${param.saidas};
-            `        
-
+            let ${param.saidas};`        
     },
     procedimento: function (args) {
 
-        nome = args.replace(/procedimento/gi, "");
+        let nome = args.replace(/procedimento/gi, "");
 
         PeteqsHelper.in_function = true;
 
@@ -119,7 +160,7 @@ const PeteqsCore = {
         return `
             loopStart = Date.now();
             while(${PeteqsHelper.exp_converter(cond)}){
-                if(Date.now() - loopStart > 10000){
+                if(Date.now() - loopStart > 30000){
                     PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
                     break;
                 }
@@ -141,7 +182,64 @@ const PeteqsCore = {
             return [variavel, min, max];
         })();
         
-        return PeteqsHelper.ptq_para(args);
+        return PeteqsCore.ptq_para(args);
+    },
+    ptq_para: function (variaveis) {
+        //Args é array com modelo Variavel, começo e fim
+        let variavel = variaveis[0];
+        let começo = variaveis[1];
+        let fim = variaveis[2];
+
+        let code = "";
+        
+        if(PeteqsHelper.is_num(começo) && PeteqsHelper.is_num(fim)){
+            if (fim < começo) {
+                code = `
+                loopStart = Date.now();
+                for(var ${variavel} = ${começo}; ${variavel}>= ${fim};${variavel}--){
+                    if(Date.now() - loopStart > 30000){
+                        PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
+                        break;
+                    }
+                    `;
+                
+            }
+            else {
+                code = `
+                loopStart = Date.now();
+                for(var ${variavel} = ${começo}; ${variavel}<= ${fim};${variavel}++){
+                    if(Date.now() - loopStart > 30000){
+                        PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
+                        break;
+                    }
+                    `;
+               
+            }
+        }
+        else{
+             code = `
+             loopStart = Date.now();
+             ${variavel} = ${começo};
+             if(${fim}>${começo}){
+               increment = true;   
+               var condition = '${variavel} < ${fim}';
+               
+              }
+              else{
+                increment =  false;
+                var condition = '${variavel} > ${fim}';
+              }
+             while(true){
+             if(Date.now() - loopStart > 30000){
+                        PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
+                        break;
+                    }
+              ${variavel} = increment ? ++${variavel}:--${variavel};
+              if(eval(condition)){
+                 break;
+              }`
+        }
+        return code;
     },
     fim: function (linha) {
 
@@ -164,7 +262,7 @@ const PeteqsCore = {
 const PeteqsHelper = {
     vars: []
     ,
-    tokens: [" + ", " - ", " * ", "/", ' mod ', " <> ", " = ", " E ", " OU ", " NÃO ", 'VERDADEIRO', 'FALSO']
+    tokens: [" + ", " - ", " * ", "/", ' mod ', " <> ", "= ", " E ", " OU ", " NÃO ", 'VERDADEIRO', 'FALSO']
     ,
     separators: ["(", ")", ","]
     ,
@@ -172,63 +270,8 @@ const PeteqsHelper = {
     ,
     in_function: false
     ,
-    ptq_para: function (variaveis) {
-        //Args é array com modelo Variavel, começo e fim
-        let variavel = variaveis[0];
-        let começo = variaveis[1];
-        let fim = variaveis[2];
-
-        let code = "";
-        
-        if(PeteqsHelper.is_num(fim) && PeteqsHelper.is_num(fim)){
-            if (fim < começo) {
-                code = `
-                loopStart = Date.now();
-                for(var ${variavel} = ${fim}; ${variavel}>= ${começo};${variavel}--){
-                    if(Date.now() - loopStart > 10000){
-                        PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
-                        break;
-                    }
-                    `;
-                
-            }
-            else {
-                code = `
-                loopStart = Date.now();
-                for(var ${variavel} = ${começo}; ${variavel}<= ${fim};${variavel}++){
-                    if(Date.now() - loopStart > 10000){
-                        PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
-                        break;
-                    }
-                    `;
-               
-            }
-        }
-        else{
-             code = `
-             loopStart = Date.now();
-             ${variavel} = ${começo};
-             if(${fim}>${começo}){
-               increment = true;   
-               var condition = '${variavel} < ${fim}';
-               
-              }
-              else{
-                increment =  false;
-                var condition = '${variavel} > ${fim}';
-              }
-             while(true){
-             if(Date.now() - loopStart > 10000){
-                        PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
-                        break;
-                    }
-              ${variavel} = increment ? ++${variavel}:--${variavel};
-              if(eval(condition)){
-                 break;
-              }`
-        }
-        return code;
-    },
+    in_programa: false
+    ,
     exp_converter: function (linha) {
 
         PeteqsHelper.tokens.forEach(function (token) {
@@ -236,14 +279,14 @@ const PeteqsHelper = {
             switch (token) {
                 case '/':
                     if(linha.match("/")){
-                        linha = linha += ">> 0;";
+                        linha = linha += ">> 0";
                     }
                     break;
                 case ' mod ':
                     linha = linha.replace(/mod/gi, '%');
                     break;
-                case ' = ':
-                    linha = linha.replace(token, '==');
+                case '= ':
+                    linha = linha.replace(/\b=\b/g, '==');
                     break;
                 case ' <> ':
                     linha = linha.replace(token, '!=');
@@ -285,15 +328,11 @@ const PeteqsHelper = {
     has_atribution: function (line) {
         return line.match("<-");
     },
-    has_modulo: function (line) {
-
-        return line.match(PeteqsHelper.tokens[4]);
-    },
     vector_exists_check: function (line) {
 
-        vectors = line.match(/[a-zA-Z0-9_]*(?=\[)/g);
+        let vectors = line.match(/[a-zA-Z0-9_]*(?=\[)/g);
 
-        code = "";
+        let code = "";
 
         vectors.forEach(function (vector) {
             if (vector) {
@@ -353,12 +392,16 @@ const PeteqsHelper = {
         else if (linha.match("//")) {
             return linha; //Comentário
         }
+        else if (linha.match(/Programa/gi)){
+            PeteqsHelper.in_programa = true;
+            return `/*** ${linha} ***/`
+        }
         else { //É uma chamada de procedimento
             if (linha != "" && !PeteqsHelper.has_atribution(linha)) {
                 return `if (typeof (${linha}) === 'function') {
                     ${linha}();
                 }
-                `
+                `;
             }
             return linha;
         }
@@ -374,6 +417,9 @@ const PeteqsHelper = {
         try {
             if (target) {
                 target.innerHTML = "";
+                if(PeteqsHelper.in_programa == true){
+                    code = code.slice(0,-1);
+                }
                 console.log(code);
                 PQ_print(target, eval(code));
             }
