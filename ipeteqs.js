@@ -187,8 +187,8 @@ const PeteqsCore = {
     ptq_para: function (variaveis) {
         //Args é array com modelo Variavel, começo e fim
         let variavel = variaveis[0];
-        let começo = variaveis[1];
-        let fim = variaveis[2];
+        let começo = variaveis[1].trim();
+        let fim = variaveis[2].trim();
 
         let code = "";
         
@@ -268,7 +268,7 @@ const PeteqsCore = {
 const PeteqsHelper = {
     vars: []
     ,
-    tokens: [" + ", " - ", " * ", "/", ' mod ', " <> ", "= ", " E ", " OU ", " NÃO ", 'VERDADEIRO', 'FALSO']
+    tokens: [" + ", " - ", " * ", "/", ' mod ', " <> ", "=", " E ", " OU ", " NÃO ", 'VERDADEIRO', 'FALSO']
     ,
     separators: ["(", ")", ","]
     ,
@@ -291,7 +291,7 @@ const PeteqsHelper = {
                 case ' mod ':
                     linha = linha.replace(/mod/gi, '%');
                     break;
-                case '= ':
+                case '=':
                     linha = linha.replace(/(?<![<>])=/g, '==');
                     break;
                 case ' <> ':
@@ -403,7 +403,7 @@ const PeteqsHelper = {
             return `/*** ${linha} ***/`
         }
         else { //É uma chamada de procedimento
-            if (linha != "" && !PeteqsHelper.has_atribution(linha)) {
+            if (linha != "" && linha.match(/\(.*\)/gi)) {
                 return `if (typeof (${linha}) === 'function') {
                     ${linha}();
                 }
