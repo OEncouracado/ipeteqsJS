@@ -222,11 +222,13 @@ const PeteqsCore = {
              ${variavel} = ${começo};
              if(${fim}>${começo}){
                increment = true;   
+               ${variavel}--
                var condition = '${variavel} <= ${fim}';
                
               }
               else{
                 increment =  false;
+                ${variavel}++
                 var condition = '${variavel} >= ${fim}';
               }
              while(true){
@@ -235,9 +237,9 @@ const PeteqsCore = {
                         break;
                     }
               if(increment){
-                ${variavel} = ${variavel} + 1;
+                ${variavel}++;
               }else{
-                ${variavel} = ${variavel} -1;
+                ${variavel}--;
               }
               if(!eval(condition)){
                  break;
