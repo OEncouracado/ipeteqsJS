@@ -234,7 +234,11 @@ const PeteqsCore = {
                         PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
                         break;
                     }
-              ${variavel} = increment ? ++${variavel}:--${variavel};
+              if(${variavel}){
+                ${variavel} = ${variavel} + 1;
+              }else{
+                ${variavel} = ${variavel} -1;
+              }
               if(eval(condition)){
                  break;
               }`
