@@ -294,10 +294,10 @@ const PeteqsHelper = {
                     linha = linha.replace(/mod/gi, '%');
                     break;
                 case '=':
-                    linha = linha.replace(/[^<>]=+/g, '==');
+                    linha = linha.replace(/[^<>!]=+/g, '==');
                     break;
                 case ' <> ':
-                    linha = linha.replace(token, '!=');
+                    linha = linha.replace(/<>/gi, '!=');
                     break;
                 case ' E ':
                     linha = linha.replace(token, '&&');

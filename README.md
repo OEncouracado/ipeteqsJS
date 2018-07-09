@@ -60,7 +60,7 @@ IPETEQS possui também desvios condicionais, que atuam nos operadores lógicos `
 
     SE C = 2
       imprimaln 'C é 2'
-    SENÃO SE C<>3
+    SENÃO SE C <> 3
       imprimaln 'C não é 3'
     SENÃO
       imprima 'C é qualquer outro número'
