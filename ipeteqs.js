@@ -285,14 +285,16 @@ const PeteqsHelper = {
             switch (token) {
                 case '/':
                     if(linha.match("/")){
-                        linha = linha += ">> 0";
+                        if (!linha.match(/\d\.\d/g)){
+                            linha = linha + ">> 0";
+                        }                        
                     }
                     break;
                 case ' mod ':
                     linha = linha.replace(/mod/gi, '%');
                     break;
                 case '=':
-                    linha = linha.replace(/(?<![<>])=/g, '==');
+                    linha = linha.replace(/[^<>]=+/g, '==');
                     break;
                 case ' <> ':
                     linha = linha.replace(token, '!=');
