@@ -255,7 +255,7 @@ const PeteqsCore = {
             if(PeteqsHelper.vars.length>0){
               let conversion = `${PeteqsHelper.vars[PeteqsHelper.vars.length-1]}= resultado;`
               return `${conversion}
-              return ${PeteqsHelper.vars.pop()} ; }`
+              return ${PeteqsHelper.vars.pop()} || resultado ; }`
             }
             else{
                 return "}";
