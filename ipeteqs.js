@@ -344,7 +344,7 @@ const PeteqsHelper = {
      */ 
     has_vector: function (line) {
 
-        let regex = /\[.*\]/gU;
+        let regex = /\[(.+?)\]/g;
 
         return line.match(regex);
     },
