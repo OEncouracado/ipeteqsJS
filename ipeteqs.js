@@ -106,7 +106,7 @@ const PeteqsCore = {
      * Equivale às estruturas ELSE e ELSE IF do Javascript.
      */
     senao: function (cond = '') {
-        cond = cond.replace('senão', '');
+        cond = cond.replace(/senão/gi, '');
 
         if (cond.match(/se/gi)) { //SENÃO SE var == Falso
             cond.replace(/se/gi, "");
