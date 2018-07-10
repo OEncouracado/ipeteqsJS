@@ -60,14 +60,14 @@ const PeteqsCore = {
 
         //Verifica a existência de um vetor e o inicializa caso não exista.
         let variavel = PeteqsHelper.handle_vectors(linha);
-
+        let code = ""
         if (PeteqsHelper.has_vector(linha)) {
-            return `${variavel} = prompt('Insira o valor da variável do vetor');`;
+            code = `${variavel} = prompt('Insira o valor da variável do vetor');`;
         }
 
         //Javascript faz typecasting pra string na função prompt. Aqui garantimos que os números sejam números
-        return `${variavel} = prompt('Insira o valor da variável ${variavel}');
-        if(!isNaN(${variavel})){
+        code = `${variavel} = prompt('Insira o valor da variável ${variavel}');`
+        return code+`\nif(!isNaN(${variavel})){
             ${variavel} = Number(${variavel})
         }`;
     },
@@ -296,6 +296,9 @@ const PeteqsHelper = {
                         }
                     }
                     break;
+                case ' - ':
+                    linha = linha.replace(/–/g,'-');
+                break;
                 case ' mod ':
                     linha = linha.replace(/mod/gi, '%');
                     break;
@@ -303,7 +306,7 @@ const PeteqsHelper = {
                     linha = linha.replace(/[^<>!]=+/g, '==');
                     break;
                 case ' <> ':
-                    linha = linha.replace(/<>/gi, '!=');
+                    linha = linha.replace(/<>/g, '!=');
                     break;
                 case ' E ':
                     linha = linha.replace(/ E /g, '&&');
