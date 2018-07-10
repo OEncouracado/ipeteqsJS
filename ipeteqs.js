@@ -61,12 +61,15 @@ const PeteqsCore = {
         //Verifica a existência de um vetor e o inicializa caso não exista.
         let variavel = PeteqsHelper.handle_vectors(linha);
         let code = ""
+
         if (PeteqsHelper.has_vector(linha)) {
             code = `${variavel} = prompt('Insira o valor da variável do vetor');`;
         }
+        else{
+            code = `${variavel} = prompt('Insira o valor da variável ${variavel}');`;
+        }
 
-        //Javascript faz typecasting pra string na função prompt. Aqui garantimos que os números sejam números
-        code = `${variavel} = prompt('Insira o valor da variável ${variavel}');`
+        //Javascript faz typecasting pra string na função prompt. Aqui garantimos que os números sejam números        
         return code+`\nif(!isNaN(${variavel})){
             ${variavel} = Number(${variavel})
         }`;
