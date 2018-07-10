@@ -11,12 +11,12 @@ function PQ_print(target) {
 
     //arguments[0] é target
     for (var i = 1; i < arguments.length; i++) {
-        if (arguments[i]) {
+        if (arguments[i] || arguments[i] === 0) {
             if (isNaN(Number(arguments[i]))) {
                 target.innerHTML += arguments[i];
             }
             else {
-                target.innerHTML += Number(arguments[i]);
+                target.innerHTML += arguments[i];
             }
         }
     }
@@ -206,31 +206,6 @@ const PeteqsCore = {
 
         let code = "";
 
-        if (PeteqsHelper.is_num(começo) && PeteqsHelper.is_num(fim)) {
-            if (fim < começo) {
-                code = `
-                    loopStart = Date.now();
-                    for(var ${variavel} = ${começo}; ${variavel}>= ${fim};${variavel}--){
-                        if(Date.now() - loopStart > 30000){
-                            PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
-                            break;
-                        }
-                        `;
-
-            }
-            else {
-                code = `
-                    loopStart = Date.now();
-                    for(var ${variavel} = ${começo}; ${variavel}<= ${fim};${variavel}++){
-                        if(Date.now() - loopStart > 30000){
-                            PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
-                            break;
-                        }
-                        `;
-
-            }
-        }
-        else {
             code = `
                  loopStart = Date.now();
                  ${variavel} = ${começo};
@@ -259,7 +234,6 @@ const PeteqsCore = {
                     --${variavel};
                   }
                   `
-        }
         return code;
     },
     /**
@@ -395,9 +369,6 @@ const PeteqsHelper = {
         });
 
         return code;
-    },
-    is_num: function (arg) {
-        return !isNaN(parseInt(arg));
     },
     /**
      * Função de análise de linha PETEQS.
