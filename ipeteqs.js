@@ -253,7 +253,7 @@ const PeteqsCore = {
             if (PeteqsHelper.vars.length > 0) {
                 let conversion = `${PeteqsHelper.vars[PeteqsHelper.vars.length - 1]}= resultado;`
                 return `${conversion}
-              return ${PeteqsHelper.vars.pop()} || resultado ; }`
+              return ${PeteqsHelper.vars.pop()}; \n}`
             }
             else {
                 return "}";
@@ -321,10 +321,10 @@ const PeteqsHelper = {
                     linha = linha.replace(/ NÃO /g, '!');
                     break;
                 case 'VERDADEIRO':
-                    linha = linha.replace(/verdadeiro/gi, 'true');
+                    linha = linha.replace(/Verdadeiro/g, 'true');
                     break;
                 case 'FALSO':
-                    linha = linha.replace(/falso/gi, 'false');
+                    linha = linha.replace(/Falso/g, 'false');
                     break;
                 default:
                     break;
