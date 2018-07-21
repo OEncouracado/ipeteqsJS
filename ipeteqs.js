@@ -2,7 +2,7 @@
  * Ipeteqs.js -> Implementação do interpretador de PETEQS ipeteqs em javascript 
  * 
  * 
- * @author leon de frança nascimento
+ * @author Leon de França Nascimento
  */
 
 
@@ -40,7 +40,7 @@ const PeteqsCore = {
     * em javascript
     */
     imprima: function (args = '') {
-        let statement = PeteqsHelper.exp_converter(args.replace(/imprimaln|imprima/, ''));
+        let statement = PeteqsHelper.exp_converter(args.replace(/^imprimaln|^imprima/, ''));
         return `PQ_print(target,${statement});`
     },
     /**
@@ -65,12 +65,12 @@ const PeteqsCore = {
         if (PeteqsHelper.has_vector(linha)) {
             code = `${variavel} = prompt('Insira o valor da variável do vetor');`;
         }
-        else{
+        else {
             code = `${variavel} = prompt('Insira o valor da variável ${variavel}');`;
         }
 
         //Javascript faz typecasting pra string na função prompt. Aqui garantimos que os números sejam números        
-        return code+`\nif(!isNaN(${variavel})){
+        return code + `\nif(!isNaN(${variavel})){
             ${variavel} = Number(${variavel})
         }`;
     },
@@ -209,7 +209,7 @@ const PeteqsCore = {
 
         let code = "";
 
-            code = `
+        code = `
                  loopStart = Date.now();
                  ${variavel} = ${começo};
                  if(${fim}>${começo}){
@@ -251,7 +251,7 @@ const PeteqsCore = {
             PeteqsHelper.in_function = false;
 
             if (PeteqsHelper.vars.length > 0) {
-                let conversion = `${PeteqsHelper.vars[PeteqsHelper.vars.length - 1]}= resultado;`
+                let conversion = `${PeteqsHelper.vars[PeteqsHelper.vars.length - 1]}= typeof resultado != "undefined" ? resultado : ${PeteqsHelper.vars[PeteqsHelper.vars.length - 1]};`
                 return `${conversion}
               return ${PeteqsHelper.vars.pop()}; \n}`
             }
@@ -300,8 +300,8 @@ const PeteqsHelper = {
                     }
                     break;
                 case ' - ':
-                    linha = linha.replace(/–/g,'-');
-                break;
+                    linha = linha.replace(/–/g, '-');
+                    break;
                 case ' mod ':
                     linha = linha.replace(/mod/gi, '%');
                     break;
@@ -450,7 +450,7 @@ const PeteqsHelper = {
      * Analisa, interpreta e executa o código PETEQS no alvo designado.
      */
     execute: function (PQ_code, target) {
-
+        PQ_code = PQ_code.replace(//g,"<-");
         let lines = PQ_code.split("\n");
         let code = "";
         for (var i = 0; i < lines.length; i++) {
@@ -460,7 +460,7 @@ const PeteqsHelper = {
             if (target) {
                 target.innerHTML = "";
                 if (PeteqsHelper.in_programa == true) {
-                    code = code.slice(0, -1);
+                    code = code.trim().slice(0,-1);
                 }
                 console.log(code);
                 PQ_print(target, eval(code));
