@@ -374,8 +374,8 @@ const PeteqsHelper = {
 
                 scoped_vector = vector + "__" + PeteqsHelper.in_function[PeteqsHelper.in_function.length - 1]
 
-                PeteqsHelper.vars.forEach(var){
-                    if (scoped_vector == var){
+                PeteqsHelper.vars.forEach(variable){
+                    if (scoped_vector == variable){
                         vector_already_exists = true;
                     }
                 }
@@ -457,7 +457,7 @@ const PeteqsHelper = {
             if (linha != "" && linha.match(/\(.*\)/gi)) {
 
                 linha = linha.match(/(\S+(?=\())(\(.*\))/g);
-
+                console.log(linha);
                 return `if (typeof (${linha}) === 'function') {
                     ${linha}();
                 }
