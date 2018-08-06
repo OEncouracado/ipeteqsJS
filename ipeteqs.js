@@ -368,8 +368,22 @@ const PeteqsHelper = {
         let code = "";
 
         vectors.forEach(function (vector) {
+
             if (vector) {
-                code += `if(typeof ${vector} === 'undefined' || !${vector}){\n${vector} = Array("null")\n}`;
+                vector_already_exists = false;
+
+                scoped_vector = vector + "__" + PeteqsHelper.in_function[PeteqsHelper.in_function.length - 1]
+
+                PeteqsHelper.vars.forEach(var){
+                    if (scoped_vector == var){
+                        vector_already_exists = true;
+                    }
+                }
+                if(!vector_already_exists){
+                vector = scoped_vector
+                PeteqsHelper.vars.push(vector);
+                code += `if(typeof ${vector} === 'undefined' || !${vector}){\n${vector} = Array("null")\n}`;                
+                }
             }
         });
 
@@ -441,6 +455,9 @@ const PeteqsHelper = {
         }
         else { //É uma chamada de procedimento
             if (linha != "" && linha.match(/\(.*\)/gi)) {
+
+                linha = linha.match(/(\S+(?=\())(\(.*\))/g);
+
                 return `if (typeof (${linha}) === 'function') {
                     ${linha}();
                 }
