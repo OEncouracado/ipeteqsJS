@@ -374,11 +374,12 @@ const PeteqsHelper = {
 
                 scoped_vector = vector + "__" + PeteqsHelper.in_function[PeteqsHelper.in_function.length - 1]
 
-                PeteqsHelper.vars.forEach(variable){
+                PeteqsHelper.vars.forEach(function(variable) {
                     if (scoped_vector == variable){
                         vector_already_exists = true;
                     }
-                }
+                });
+
                 if(!vector_already_exists){
                 vector = scoped_vector
                 PeteqsHelper.vars.push(vector);
