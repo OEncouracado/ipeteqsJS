@@ -12,12 +12,7 @@ function PQ_print(target) {
     //arguments[0] é target
     for (var i = 1; i < arguments.length; i++) {
         if (arguments[i] || arguments[i] === 0) {
-            if (isNaN(Number(arguments[i]))) {
-                target.innerHTML += arguments[i];
-            }
-            else {
-                target.innerHTML += arguments[i];
-            }
+            target.innerHTML += arguments[i];
         }
     }
 
@@ -56,18 +51,15 @@ const PeteqsCore = {
     * Caso a variável seja um vetor, tenta criar o vetor se este não existir.
     */
     leia: function (linha) {
+
+        let code = ""
+
         linha = linha.substring(4, linha.length); //Remove o leia
 
         //Verifica a existência de um vetor e o inicializa caso não exista.
         let variavel = PeteqsHelper.handle_vectors(linha);
-        let code = ""
-
-        if (PeteqsHelper.has_vector(linha)) {
-            code = `${variavel} = prompt('Insira o valor da variável do vetor');`;
-        }
-        else {
-            code = `${variavel} = prompt('Insira o valor da variável ${variavel}');`;
-        }
+        
+        code = PeteqsHelper.get_input(PeteqsHelper.has_vector(linha),variavel);
 
         //Javascript faz typecasting pra string na função prompt. Aqui garantimos que os números sejam números        
         return code + `\nif(!isNaN(${variavel})){
@@ -85,21 +77,20 @@ const PeteqsCore = {
 
         args = PeteqsHelper.handle_vectors(args);
 
-        return args.replace("<-", "=");
+        return args.replace(/<-/, "=");
     },
     /**
      * Função condicional: Separa os tokens PETEQS e retorna uma desvio condicional em Javascript.
      */
     se: function (cond) {
         //Ex.: SE Var = Verdadeiro ENTÃO
-        cond = cond.replace(/se/gi, '');
+        cond = cond.replace(/se/gi, "");
 
         if (cond.match(/então/gi)) {
             cond = cond.replace(/então/gi, "");
         }
-        cond = cond.trim();
 
-        cond = PeteqsHelper.exp_converter(cond);
+        cond = PeteqsHelper.exp_converter(cond.trim());
 
         //Torna-se: if(var == true){
         return `if(${cond}){`;
@@ -114,15 +105,12 @@ const PeteqsCore = {
 
         //A condição pode ou não estar presente
         if (cond.match(/se/gi)) {
-            cond.replace(/se/gi, "");
             cond = PeteqsCore.se(cond);
         }
         //Se tiver uma condição (else if), retorna esta estrutura; caso contrario, cond é falsy('')
         return cond ? "}else " + cond : "}else{";
     },
     funcao: function (args) {
-
-        PeteqsHelper.in_function = true;
 
         let regex = /(\S+(?=\())(\(.*\))/;
 
@@ -144,6 +132,8 @@ const PeteqsCore = {
 
         }(assinatura[2]);
 
+        //Atualiza as pilhas referente as funçoes
+        PeteqsHelper.in_function.push(nome);
         PeteqsHelper.vars.push(param.saidas.split(","));
 
         return `function ${nome}(${param.entradas}){
@@ -211,28 +201,28 @@ const PeteqsCore = {
 
         code = `
                  loopStart = Date.now();
-                 ${variavel} = ${começo};
+                 var ${variavel} = ${começo};
                  if(${fim}>${começo}){
                    increment = true;   
-                   ${variavel}--
-                   var condition = '${variavel} < ${fim}';
+                   ${variavel}--;
+                   var condition_${variavel} = '${variavel} < ${fim}';
                    
                   }
                   else{
                     increment =  false;
-                    ${variavel}++
-                    var condition = '${variavel} > ${fim}';
+                    ${variavel}++;
+                    var condition_${variavel} = '${variavel} > ${fim}';
                   }
                  while(true){
                  if(Date.now() - loopStart > 30000){
                             PQ_print(target,'Erro no código - Loop demorou demais. Verifique se existe um loop infinito.')
                             break;
                         }
-                        if(!eval(condition)){
+                        if(!eval(condition_${variavel})){
                             break;
                          }
                   if(increment){
-                    ++${variavel};
+                    ${variavel}++;
                   }else{
                     --${variavel};
                   }
@@ -248,16 +238,21 @@ const PeteqsCore = {
     fim: function (linha) {
 
         if (PeteqsHelper.in_function && !linha.match(/para|se|enquanto|pr[oó]ximo/gi)) {
-            PeteqsHelper.in_function = false;
-
+            
             if (PeteqsHelper.vars.length > 0) {
-                let conversion = `${PeteqsHelper.vars[PeteqsHelper.vars.length - 1]}= typeof resultado != "undefined" ? resultado : ${PeteqsHelper.vars[PeteqsHelper.vars.length - 1]};`
+                let funcvar = PeteqsHelper.vars[PeteqsHelper.vars.length - 1]
+
+                let conversion = `${funcvar}= typeof resultado != "undefined" ? resultado : ${funcvar};`
+
                 return `${conversion}
-              return ${PeteqsHelper.vars.pop()}; \n}`
+                   return ${PeteqsHelper.vars.pop()}; \n}`
             }
             else {
                 return "}";
             }
+
+            //Remove o flag da funçao atual da pilha de funçoes
+            PeteqsHelper.in_function.pop();
         }
         return "}";
     }
@@ -267,15 +262,15 @@ const PeteqsHelper = {
     //Pilha que contém as variaveis de saída de funções
     vars: []
     ,
+    //Pilha que controla os blocos de funçao
+    in_function: []
+    ,
     //Operadores da linguagem PETEQS -- Usados em PeteqsHelper.exp_converter()
     operators: [" + ", " - ", " * ", "/", ' mod ', " <> ", "=", " E ", " OU ", " NÃO ", 'VERDADEIRO', 'FALSO']
     ,
     //Palavras reservadas
-    reserved_words: [/início/gi, /fim/gi, /pr[óo]ximo/gi, /senão/gi, /função/gi, /programa/gi,]
-    ,
-    //Determina se a linha analisada faz parte de um bloco contido em uma função
-    in_function: false
-    ,
+    reserved_words: [/^início/gi, /^fim/gi, /^pr[óo]ximo/gi, /^senão/gi, /^função/gi, /^programa/gi,]
+    ,    
     //Determina se a linha analisada faz parte de um bloco contido em um programa
     in_programa: false
     ,
@@ -295,7 +290,11 @@ const PeteqsHelper = {
                         if (!linha.match(/\d\.\d/g)) {
                             //Caso não se especifique que deseja-se operar em números reais, trunca-se a parte decimal.
                             //Operadores bitwise em JS convertem por padrão o número para um int de 32 bits.
-                            linha = linha + ">> 0";
+                            divisoes = linha.match(/(\b.*\/.*\b)/g);
+
+                            divisoes.forEach(function(match){
+                                linha = linha.replace(match,"($&>>0)");
+                            });
                         }
                     }
                     break;
@@ -356,7 +355,7 @@ const PeteqsHelper = {
      * Regex para avaliar se a linha avaliada possui uma operação de atribuição
      */
     has_atribution: function (line) {
-        return line.match("<-");
+        return line.match(/<-/g);
     },
     /**
      * Toda vez que uma linha contem um vetor, identifica o nome das variaveis que representam vetores e 
@@ -370,11 +369,21 @@ const PeteqsHelper = {
 
         vectors.forEach(function (vector) {
             if (vector) {
-                code += `if(typeof ${vector} === 'undefined' || !${vector}){${vector} = Array("null")}`;
+                code += `if(typeof ${vector} === 'undefined' || !${vector}){\n${vector} = Array("null")\n}`;
             }
         });
 
         return code;
+    },
+    get_input:function(flag,varname){
+        //Flag muda a apresentaç~ao do prompt
+
+        if (flag) {
+            return `${varname} = prompt('Insira o valor da variável do vetor');`;
+        }   
+        else {
+            return `${varname} = prompt('Insira o valor da variável ${varname}');`;
+        }
     },
     /**
      * Função de análise de linha PETEQS.
@@ -386,7 +395,7 @@ const PeteqsHelper = {
         linha = linha.trim();
 
         if (PeteqsHelper.has_atribution(linha)) {
-            if (linha.match(/para|PARA/)) {
+            if (linha.match(/^para|^PARA/)) {
                 return PeteqsCore.para(linha);
             }
             else {
@@ -413,9 +422,6 @@ const PeteqsHelper = {
         }
         else if (linha.match(/se/gi)) {
             return PeteqsCore.se(linha);
-        }
-        else if (linha.match(/para/gi)) {
-            return PeteqsCore.para(linha);
         }
         else if (linha.match(/enquanto/gi)) {
             return PeteqsCore.enquanto(linha);
@@ -474,3 +480,47 @@ const PeteqsHelper = {
         }
     }
 };
+
+//----------------- Funçoes utilitarias CEDERJ --------------------//
+
+function ordem(char){
+    return char.charCodeAt(0);
+}
+
+function tamanho(mensuravel){
+    return mensuravel.length;
+} 
+
+function charAt(str,pos){
+    return str.charAt(pos-1);
+}
+
+function abs(num){
+    return num > 0? num : -num;
+}
+
+function concat(str1,str2){
+    return str1 + str2;
+}
+
+function find(string, sub){
+    if (!string.match(sub)){
+        return -1;
+    }
+
+    let matches = 0;
+    let index = 0;
+
+    do{
+        if(string[index] == sub[matches]){
+            matches++;
+
+        }
+        else{
+            matches = 0;
+        }
+        index++;
+    } while(matches < sub.length)
+
+    return (index - sub.length)+1;
+}
