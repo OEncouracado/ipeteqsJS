@@ -35,7 +35,7 @@ const PeteqsCore = {
     * em javascript
     */
     imprima: function (args = '') {
-        let statement = PeteqsHelper.exp_converter(args.replace(/^imprimaln|^imprima/, ''));
+        let statement = PeteqsHelper.exp_converter(args.replace(/^imprimaln|^imprima/gi, ''));
         return `PQ_print(target,${statement});`
     },
     /**
@@ -293,6 +293,10 @@ const PeteqsHelper = {
                             divisoes = linha.match(/(\b.*\/.*\b)/g);
 
                             divisoes.forEach(function(match){
+                                if(divisoes == linha){
+                                    linha = linha.replace(match,"$&>>0");
+                                    return;
+                                }
                                 linha = linha.replace(match,"($&>>0)");
                             });
                         }
@@ -448,7 +452,6 @@ const PeteqsHelper = {
             }
             return linha;
         }
-
     },
     /**
      * Recebe um string contendo codigo em PETEQS e um alvo DOM
@@ -463,12 +466,12 @@ const PeteqsHelper = {
             code += "\n" + PeteqsHelper.analyze(lines[i]);
         }
         try {
+            console.log(code)
             if (target) {
                 target.innerHTML = "";
                 if (PeteqsHelper.in_programa == true) {
                     code = code.trim().slice(0,-1);
                 }
-                console.log(code);
                 PQ_print(target, eval(code));
             }
             else {
@@ -476,51 +479,10 @@ const PeteqsHelper = {
             }
         }
         catch (e) {
+            console.log(e)
             return PQ_print(target, "<br>Existe um erro no código", "<hr>", e);
         }
     }
 };
 
-//----------------- Funçoes utilitarias CEDERJ --------------------//
 
-function ordem(char){
-    return char.charCodeAt(0);
-}
-
-function tamanho(mensuravel){
-    return mensuravel.length;
-} 
-
-function charAt(str,pos){
-    return str.charAt(pos-1);
-}
-
-function abs(num){
-    return num > 0? num : -num;
-}
-
-function concat(str1,str2){
-    return str1 + str2;
-}
-
-function find(string, sub){
-    if (!string.match(sub)){
-        return -1;
-    }
-
-    let matches = 0;
-    let index = 0;
-
-    do{
-        if(string[index] == sub[matches]){
-            matches++;
-
-        }
-        else{
-            matches = 0;
-        }
-        index++;
-    } while(matches < sub.length)
-
-    return (index - sub.length)+1;
-}
