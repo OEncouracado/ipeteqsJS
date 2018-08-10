@@ -412,41 +412,45 @@ const PeteqsHelper = {
         else if (linha.match(PeteqsHelper.reserved_words[1]) || linha.match(PeteqsHelper.reserved_words[2])) {
             return PeteqsCore.fim(linha);
         }
-        else if (linha.match(/imprimaln/gi)) {
+        else if (linha.match(/^imprimaln/gi)) {
             return PeteqsCore.imprimaln(linha);
         }
-        else if (linha.match(/imprima/gi)) {
+        else if (linha.match(/^imprima/gi)) {
             return PeteqsCore.imprima(linha);
         }
-        else if (linha.match(/leia/gi)) {
+        else if (linha.match(/^leia/gi)) {
             return PeteqsCore.leia(linha);
         }
-        else if (linha.match(/senão/gi)) {
+        else if (linha.match(/^senão/gi)) {
             return PeteqsCore.senao(linha);
         }
-        else if (linha.match(/se/gi)) {
+        else if (linha.match(/^se/gi)) {
             return PeteqsCore.se(linha);
         }
-        else if (linha.match(/enquanto/gi)) {
+        else if (linha.match(/^enquanto/gi)) {
             return PeteqsCore.enquanto(linha);
         }
-        else if (linha.match(/função/gi)) {
+        else if (linha.match(/^função/gi)) {
             return PeteqsCore.funcao(linha);
         }
-        else if (linha.match(/procedimento/gi)) {
+        else if (linha.match(/^procedimento/gi)) {
             return PeteqsCore.procedimento(linha);
         }
         else if (linha.match("//")) {
             return linha; //É um comentário
         }
-        else if (linha.match(/Programa/gi)) {
+        else if (linha.match(/^Programa/gi)) {
             PeteqsHelper.in_programa = true;
             return `/*** ${linha} ***/`;
         }
         else { //É uma chamada de procedimento
-            if (linha != "" && linha.match(/\(.*\)/gi)) {
-                return `if (typeof (${linha}) === 'function') {
-                    ${linha}();
+            let match = linha.match(/\(.*\)/gi)
+            if (linha != "" && match) {
+
+                f_name = linha.replace(/\(.*\)/gi,"")
+
+                return `if (typeof (${f_name}) === 'function') {
+                    ${linha};
                 }
                 `;
             }

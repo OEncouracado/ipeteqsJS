@@ -5,7 +5,7 @@ function ordem(char){
 }
 
 function tamanho(mensuravel){
-    return mensuravel.length;
+    return mensuravel.length-1;
 } 
 
 function charAt(str,pos){
