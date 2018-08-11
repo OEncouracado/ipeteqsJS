@@ -473,6 +473,28 @@ const PeteqsHelper = {
             return linha;
         }
     },
+    clean_PTQ_code:function(code){
+
+        code = code.replace(//g,"<-");
+        
+
+        procs = code.match(/procedimento/gi) !== null ? code.match(/procedimento/gi).length : 0;
+        funcs = code.match(/função/gi) !== null ? code.match(/função/gi).length : 0;
+        inicios = code.match(/in[í|i]cio/gi) !== null ? code.match(/in[í|i]cio/gi).length : 0;
+        fins = code.match(/fim/gi) !== null ? code.match(/fim/gi).length : 0;
+
+        if((procs + funcs)*2 != (inicios + fins)){ 
+            //Nesse caso, provavelemte existe uma declararação de "progama", que gera uma chave '}' a mais no codigo JS
+            var n = code.replace(/fim/gi,"fim").lastIndexOf('fim');
+
+            // slice the string in 2, one from the start to the lastIndexOf
+            // and then replace the word in the rest
+            code = code.slice(0, n) + code.slice(n).replace(/fim/gi, '');    
+        }
+
+
+        return code.split("\n");
+    },
     /**
      * Recebe um string contendo codigo em PETEQS e um alvo DOM
      * 
@@ -483,9 +505,9 @@ const PeteqsHelper = {
         //Limpa as variaveis da execução anterior
         PeteqsHelper.purge();
 
-        PQ_code = PQ_code.replace(//g,"<-");
-        let lines = PQ_code.split("\n");
-        let code = "";        
+        let code = "";
+
+        let lines = PeteqsHelper.clean_PTQ_code(PQ_code);
 
         for (var i = 0; i < lines.length; i++) {
             code += "\n" + PeteqsHelper.analyze(lines[i]);
@@ -504,7 +526,6 @@ const PeteqsHelper = {
             }
         }
         catch (e) {
-            console.log(e)
             return PQ_print(target, "<br>Existe um erro no código", "<hr>", e);
         }
     }
