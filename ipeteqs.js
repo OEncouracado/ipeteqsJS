@@ -112,12 +112,12 @@ const PeteqsCore = {
     },
     funcao: function (args) {
 
-        let regex = /(\S+(?=\())(\(.*\))/;
+        let regex = /(\S+ ?(?=\())(\(.*\))/;
 
         let assinatura = args.match(regex);
 
-        let nome = assinatura[1];
-
+        let nome = assinatura[1] !== null ? assinatura[1] : alert('pepino');
+        
         //A partir dos parametros da função, retorna as entradas e saídas para 
         let param = function (args) {
             args = args.replace(/entradas?:/gi, "");
