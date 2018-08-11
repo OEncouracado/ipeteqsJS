@@ -297,13 +297,14 @@ const PeteqsHelper = {
                         if (!linha.match(/(?!^)\d\.\d/g)) {
                             //Caso não se especifique que deseja-se operar em números reais, trunca-se a parte decimal.
                             //Operadores bitwise em JS convertem por padrão o número para um int de 32 bits.
-                            divisoes = linha.match(/(?!^)(\b.*\/.*\b)/g);
+                            divisoes = linha.match(/(?!^)[^\<\-](\b.*\/.*\b)/g);
 
                             divisoes.forEach(function(match){
                                 if(divisoes == linha){
                                     linha = linha.replace(match,"$&>>0");
                                     return;
                                 }
+                                console.log(match);
                                 linha = linha.replace(match,"($&>>0)");
                             });
                         }
