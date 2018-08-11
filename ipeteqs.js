@@ -57,13 +57,13 @@ const PeteqsCore = {
         linha = linha.substring(4, linha.length); //Remove o leia
 
         //Verifica a existência de um vetor e o inicializa caso não exista.
-        let variavel = PeteqsHelper.handle_vectors(linha);
+        code = PeteqsHelper.handle_vectors(linha)+"\n";
         
-        code = PeteqsHelper.get_input(PeteqsHelper.has_vector(linha),variavel);
+        code += PeteqsHelper.get_input(PeteqsHelper.has_vector(linha),linha);
 
         //Javascript faz typecasting pra string na função prompt. Aqui garantimos que os números sejam números        
-        return code + `\nif(!isNaN(${variavel})){
-            ${variavel} = Number(${variavel})
+        return code + `\nif(!isNaN(${linha})){
+            ${linha} = Number(${linha})
         }`;
     },
     /**
@@ -240,7 +240,7 @@ const PeteqsCore = {
         if (PeteqsHelper.in_function && !linha.match(/para|se|enquanto|pr[oó]ximo/gi)) {
             
             if (PeteqsHelper.vars.length > 0) {
-                let funcvar = PeteqsHelper.vars[PeteqsHelper.vars.length - 1]
+                let funcvar = PeteqsHelper.vars.peep()
 
                 let conversion = `${funcvar}= typeof resultado != "undefined" ? resultado : ${funcvar};`
 
@@ -259,8 +259,10 @@ const PeteqsCore = {
 };
 
 const PeteqsHelper = {
-    //Pilha que contém as variaveis de saída de funções
+    //Pilha que contém as variaveis
     vars: []
+    ,
+    vectors: []
     ,
     //Pilha que controla os blocos de funçao
     in_function: []
@@ -274,6 +276,11 @@ const PeteqsHelper = {
     //Determina se a linha analisada faz parte de um bloco contido em um programa
     in_programa: false
     ,
+    purge:function(){
+        PeteqsHelper.vars = []
+        PeteqsHelper.vectors = []
+        PeteqsHelper.in_function = []
+    },
     /**
      * Para cada um dos operadores PETEQS, analisa a linha e substitui pelos equivalentes em Javascript. 
      * Aqui também é feita a correção da divisão como ocorre em PETEQS, pois em Javascript ela ocorre por padrão
@@ -285,12 +292,12 @@ const PeteqsHelper = {
 
             switch (operator) {
                 case '/':
-                    if (linha.match("/")) {
+                    if (linha.match(/(?!^).\/./)) {
 
-                        if (!linha.match(/\d\.\d/g)) {
+                        if (!linha.match(/(?!^)\d\.\d/g)) {
                             //Caso não se especifique que deseja-se operar em números reais, trunca-se a parte decimal.
                             //Operadores bitwise em JS convertem por padrão o número para um int de 32 bits.
-                            divisoes = linha.match(/(\b.*\/.*\b)/g);
+                            divisoes = linha.match(/(?!^)(\b.*\/.*\b)/g);
 
                             divisoes.forEach(function(match){
                                 if(divisoes == linha){
@@ -372,8 +379,17 @@ const PeteqsHelper = {
         let code = "";
 
         vectors.forEach(function (vector) {
-            if (vector) {
-                code += `if(typeof ${vector} === 'undefined' || !${vector}){\n${vector} = Array("null")\n}`;
+
+            if(vector != ""){
+                let flag = PeteqsHelper.vectors.includes(vector);
+                console.log(vector + "---" + flag);
+
+                if (!flag) {
+                    //Atualiza a lista de vetores
+                    PeteqsHelper.vectors.push(vector);
+
+                    code += `if(typeof ${vector} === 'undefined' || !${vector}){\n${vector} = Array("null")\n}`;
+                }
             }
         });
 
@@ -463,9 +479,14 @@ const PeteqsHelper = {
      * Analisa, interpreta e executa o código PETEQS no alvo designado.
      */
     execute: function (PQ_code, target) {
+
+        //Limpa as variaveis da execução anterior
+        PeteqsHelper.purge();
+
         PQ_code = PQ_code.replace(//g,"<-");
         let lines = PQ_code.split("\n");
-        let code = "";
+        let code = "";        
+
         for (var i = 0; i < lines.length; i++) {
             code += "\n" + PeteqsHelper.analyze(lines[i]);
         }
@@ -490,3 +511,6 @@ const PeteqsHelper = {
 };
 
 
+Array.prototype.peep = function() {
+    return this[this.length-1];
+}
