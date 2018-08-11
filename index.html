@@ -2,7 +2,7 @@
 
 <head>
   <title>IPETEQS_JS - Interpretador de PETEQS em Javascript</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="utf-8"></meta>
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
@@ -14,8 +14,10 @@
   <div>
     <header id="header" class="navbar navbar-expand-lg navbar-dark bg-dark">
       <!-- Header-->
-      <i style="color:white"class="material-icons">build</i>
-      <a class="navbar-brand" href="index.html">&nbsp :: IPETEQS_JS</a>
+      <div id="logo">
+        <i id="logo-logo" class="material-icons">build</i>
+        <a class="navbar-brand" href="index.html">&nbsp:: IPETEQS_JS</a>
+      </div>
 
       <ul class="navbar-nav">
         <li class="nav-item">
@@ -27,18 +29,25 @@
       </ul>
     </header>
     <!-- Fim do header-->
+    <div id="titles" class="row">
+      <div class="col">
+        <h4 style>Código</h4>
+      </div>
+      <div class="col">
+        <h4>Terminal</h4>
+      </div>
+    </div>
 
-    <div class="card container-fluid">
+    <div class="container-fluid">
       <div class="row">
         <div class="col-md-6 col-xs-12">
-          <h1>Código</h1>
+          
           <textarea id="codearea" name='input'></textarea>
           <button class="btn btn-success" onclick="PeteqsHelper.execute(document.querySelector('#codearea').value,document.querySelector('#visualizacao'))">
             <i class="material-icons">play_arrow</i>EXECUTAR
           </button>
         </div>
-        <div class="col-md-6 col-xs-12">
-          <h1>Terminal</h1>
+        <div class="col-md-6 col-xs-12">          
           <div id="visualizacao">
 
           </div>
@@ -47,5 +56,5 @@
     </div>
   </div>
   <script src="ipeteqs.js"></script>
-  <script src="ipeteqsTest.js"></script>
+  <script src="utilCEDERJ.js"></script>
 </body>
