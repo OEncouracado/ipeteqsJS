@@ -75,7 +75,10 @@ const PeteqsCore = {
 
         args = PeteqsHelper.exp_converter(args);
 
-        args = PeteqsHelper.handle_vectors(args);
+        if(PeteqsHelper.has_vector(args)){
+            args = args.replace(/\[([^,]+?)\]/g,"[$1 -1]")
+            args +='\n' + PeteqsHelper.handle_vectors(args);
+        }
 
         return args.replace(/<-/, "=");
     },
@@ -317,16 +320,16 @@ const PeteqsHelper = {
                     linha = linha.replace(/mod/gi, '%');
                     break;
                 case '=':
-                    linha = linha.replace(/[^<>!]=+/g, '==');
+                    linha = linha.replace(/[^<>!]=+/g, ' == ');
                     break;
                 case ' <> ':
-                    linha = linha.replace(/<>/g, '!=');
+                    linha = linha.replace(/<>/g, ' != ');
                     break;
                 case ' E ':
-                    linha = linha.replace(/ E /g, '&&');
+                    linha = linha.replace(/ E /g, ' && ');
                     break;
                 case ' OU ':
-                    linha = linha.replace(/ OU /g, '||');
+                    linha = linha.replace(/ OU /g, ' || ');
                     break;
                 case ' NÃO ':
                     linha = linha.replace(/ NÃO /g, '!');
@@ -350,9 +353,13 @@ const PeteqsHelper = {
     handle_vectors: function (line) {
 
         if (PeteqsHelper.has_vector(line)) {
-            line = PeteqsHelper.vector_exists_check(line) + line;
+            
+            line = PeteqsHelper.vector_exists_check(line);            
+
+            return line;
         }
-        return line;
+
+        return '';
     },
     /**
      * Regex para avaliar se a linha avaliada possui um vetor
@@ -375,16 +382,18 @@ const PeteqsHelper = {
      */
     vector_exists_check: function (line) {
 
+        //Verifica vetores em linha e vetores em inicialização
         let vectors = line.match(/[a-zA-Z0-9_]*(?=\[)/g);
+        let inited_vec =  line.match(/[a-zA-Z0-9_]* (?= ?\<\- ?\[)/g) !== null ? line.match(/[a-zA-Z0-9_]* (?= ?\<\- ?\[)/g) : [];
 
+        vectors = vectors.concat(inited_vec);
         let code = "";
 
         vectors.forEach(function (vector) {
 
-            if(vector != ""){
+            if(vector){
+                vector = vector.trim()
                 let flag = PeteqsHelper.vectors.includes(vector);
-                console.log(vector + "---" + flag);
-
                 if (!flag) {
                     //Atualiza a lista de vetores
                     PeteqsHelper.vectors.push(vector);
@@ -426,7 +435,7 @@ const PeteqsHelper = {
         else if (linha.match(PeteqsHelper.reserved_words[0])) {
             return '//Início';
         }
-        else if (linha.match(PeteqsHelper.reserved_words[1]) || linha.match(PeteqsHelper.reserved_words[2])) {
+        else if (linha.match(/^fim/gi) || linha.match(/^pr[óo]ximo/gi)) {
             return PeteqsCore.fim(linha);
         }
         else if (linha.match(/^imprimaln/gi)) {
@@ -487,7 +496,7 @@ const PeteqsHelper = {
         if((procs + funcs)*2 != (inicios + fins)){ 
             //Nesse caso, provavelemte existe uma declararação de "progama", que gera uma chave '}' a mais no codigo JS
             var n = code.replace(/fim/gi,"fim").lastIndexOf('fim');
-            code = code.slice(0, n) + code.slice(n).replace(/fim/gi, '');    
+            code = code.slice(0, n) + code.slice(n).replace(/fim$/gi, '');    
         }
 
         return code.split("\n");
