@@ -41,3 +41,19 @@ function find(string, sub){
 
     return (index - sub.length)+1;
 }
+//-------------------------------------------------------------------------------/
+
+function abrirCodigoJavascript(){
+    code = PeteqsHelper.execute(document.querySelector('#codearea').value);
+
+    var janela=window.open('');
+    
+    with(janela){
+        code = js_beautify(code, {
+        'indent_size': 1,
+        'indent_char': '\t'
+        });
+        code = code.replace(/\<br\>/gi,"\\n")
+        document.write("<pre>"+code+"</pre>");
+    }   
+}

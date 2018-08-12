@@ -321,7 +321,7 @@ const PeteqsHelper = {
                     linha = linha.replace(/–/g, '-');
                     break;
                 case ' mod ':
-                    linha = linha.replace(/mod/gi, '%');
+                    linha = linha.replace(/[^\w]mod[^\w]/gi, '%');
                     break;
                 case '=':
                     linha = linha.replace(/[^<>!]=+/g, ' == ');
@@ -518,6 +518,30 @@ const PeteqsHelper = {
 
         return code.split("\n");
     },
+    printCode: function(code,target){
+        try {
+            if (target) {
+                target.innerHTML = "";
+        
+                PQ_print(target,`<span>RESULTADO:</span><br>`);//Só um embelezamento bobo
+                PQ_print(target, eval(code));
+                PQ_print(target,`<span class="blink_me">&block;</span>`);//Só um embelezamento bobo
+                    
+            }
+            else {
+                return code;
+            }
+        }
+        catch (e) {
+            texto_padrao = `Reveja a sintaxe de PETEQS na documentação<br>
+            Possíveis causas de erro são:<br>
+            * Quebras de linha no lugar errado<br>
+            * Omissão de acentuação em um lugar onde deveria ter acento (ex.: Função 'mistério' sendo chamada como 'misterio')<br>
+            * Erros de digitação<br>
+            `;
+            return PQ_print(target, "<br>Existe um erro no código<br>", "<br>***************<br><br>", texto_padrao);
+        }
+    },
     /**
      * Recebe um string contendo codigo em PETEQS e um alvo DOM
      * 
@@ -535,22 +559,8 @@ const PeteqsHelper = {
         for (var i = 0; i < lines.length; i++) {
             code += "\n" + PeteqsHelper.analyze(lines[i]);
         }
-        try {
-            console.log(code)
-            if (target) {
-                target.innerHTML = "";
-                if (PeteqsHelper.in_programa == true) {
-                    code = code.trim().slice(0,-1);
-                }
-                PQ_print(target, eval(code));
-            }
-            else {
-                return new Function(code)();
-            }
-        }
-        catch (e) {
-            return PQ_print(target, "<br>Existe um erro no código", "<hr>", e);
-        }
+        
+        PeteqsHelper.printCode(code,target);
     }
 };
 
