@@ -76,8 +76,8 @@ const PeteqsCore = {
         args = PeteqsHelper.exp_converter(args);
 
         if(PeteqsHelper.has_vector(args)){
-            args = args.replace(/\[([^,]+?)\]/g,"[$1 -1]")
-            args +='\n' + PeteqsHelper.handle_vectors(args);
+            // args = args.replace(/\[([^,]+?)\]/g,"[$1 -1]")
+            args = PeteqsHelper.handle_vectors(args) + '\n' + args;
         }
 
         return args.replace(/<-/, "=");
@@ -115,11 +115,15 @@ const PeteqsCore = {
     },
     funcao: function (args) {
 
-        let regex = /(\S+ ?(?=\())(\(.*\))/;
+        //Captura o que está antes dos parenteses e o que está entre parenteses
+        let regex = /(\S+ ?(?=\())(\(.*\))/; 
+
+        //Algumas questões declaram vetores como 'vetor[]' na assinatura, o que não é permitido em JS
+        args = args.replace(/\[\]/g,"");
 
         let assinatura = args.match(regex);
 
-        let nome = assinatura[1] !== null ? assinatura[1] : alert('pepino');
+        let nome = assinatura[1];
         
         //A partir dos parametros da função, retorna as entradas e saídas para 
         let param = function (args) {
@@ -300,7 +304,7 @@ const PeteqsHelper = {
                         if (!linha.match(/(?!^)\d\.\d/g)) {
                             //Caso não se especifique que deseja-se operar em números reais, trunca-se a parte decimal.
                             //Operadores bitwise em JS convertem por padrão o número para um int de 32 bits.
-                            divisoes = linha.match(/(?!^)[^\<\-](\b.*\/.*\b)/g);
+                            divisoes = linha.match(/(?!^)[^\w\<\-](\b.*\/.*\b)/g);
 
                             divisoes.forEach(function(match){
                                 if(divisoes == linha){
@@ -392,6 +396,7 @@ const PeteqsHelper = {
         vectors.forEach(function (vector) {
 
             if(vector){
+
                 vector = vector.trim()
                 let flag = PeteqsHelper.vectors.includes(vector);
                 if (!flag) {
@@ -414,6 +419,17 @@ const PeteqsHelper = {
         else {
             return `${varname} = prompt('Insira o valor da variável ${varname}');`;
         }
+    },
+    get_scope: function(vector){
+
+        if(PeteqsHelper.in_function){
+            scoped_vector = PeteqsHelper.in_function.peep()+"_"+vector;
+        }
+         else{
+            scoped_vector = "global_"+ vector;
+        }
+
+        return scoped_vector;
     },
     /**
      * Função de análise de linha PETEQS.
@@ -475,7 +491,7 @@ const PeteqsHelper = {
 
                 f_name = linha.replace(/\(.*\)/gi,"")
 
-                return `if (typeof (${f_name}) === 'function') {
+                return `if (typeof ${f_name} === 'function') {
                     ${linha};
                 }
                 `;
@@ -486,7 +502,8 @@ const PeteqsHelper = {
     clean_PTQ_code:function(code){
 
         code = code.replace(//g,"<-");
-        
+        code = code.replace(/←/g,"<-");
+        code = code.replace(/\[([^,]+?)\]/g,"[$1 -1]");
 
         procs = code.match(/procedimento/gi) !== null ? code.match(/procedimento/gi).length : 0;
         funcs = code.match(/função/gi) !== null ? code.match(/função/gi).length : 0;
