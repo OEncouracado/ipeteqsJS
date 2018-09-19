@@ -12,7 +12,11 @@ function PQ_print(target) {
     //arguments[0] é target
     for (var i = 1; i < arguments.length; i++) {
         if (arguments[i] || arguments[i] === 0) {
+	    if (typeof arguments[i] == 'boolean'){
+	    arguments[i] = arguments[i].toString();
+	}
             target.innerHTML += arguments[i];
+	   
         }
     }
 
@@ -524,7 +528,7 @@ const PeteqsHelper = {
                 target.innerHTML = "";
         
                 PQ_print(target,`<span>RESULTADO:</span><br>`);//Só um embelezamento bobo
-                PQ_print(target, eval(code));
+                PQ_print(target, eval(code).toString());
                 PQ_print(target,`<span class="blink_me">&block;</span>`);//Só um embelezamento bobo
                     
             }
@@ -559,7 +563,6 @@ const PeteqsHelper = {
         for (var i = 0; i < lines.length; i++) {
             code += "\n" + PeteqsHelper.analyze(lines[i]);
         }
-        
         PeteqsHelper.printCode(code,target);
     }
 };
