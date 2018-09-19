@@ -44,16 +44,16 @@ function find(string, sub){
 //-------------------------------------------------------------------------------/
 
 function abrirCodigoJavascript(){
-    code = PeteqsHelper.execute(document.querySelector('#codearea').value);
-
+    let  codigo_peteqs = document.querySelector('#codearea').value;
+    var code = PeteqsHelper.execute(codigo_peteqs);
     var janela=window.open('');
-    
+   console.log(code); 
     with(janela){
-        code = js_beautify(code, {
+        beauty = js_beautify(code, {
         'indent_size': 1,
         'indent_char': '\t'
         });
-        code = code.replace(/\<br\>/gi,"\\n")
-        document.write("<pre>"+code+"</pre>");
+        beauty = beauty.replace(/\<br\>/gi,"\\n")
+        document.write("<pre>"+beauty+"</pre>");
     }   
 }

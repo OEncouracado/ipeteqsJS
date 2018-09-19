@@ -533,6 +533,7 @@ const PeteqsHelper = {
                     
             }
             else {
+		console.log(code);
                 return code;
             }
         }
@@ -563,7 +564,7 @@ const PeteqsHelper = {
         for (var i = 0; i < lines.length; i++) {
             code += "\n" + PeteqsHelper.analyze(lines[i]);
         }
-        PeteqsHelper.printCode(code,target);
+	return PeteqsHelper.printCode(code,target);
     }
 };
 
