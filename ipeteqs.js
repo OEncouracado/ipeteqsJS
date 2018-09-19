@@ -538,13 +538,18 @@ const PeteqsHelper = {
             }
         }
         catch (e) {
+	    console.log(e.name);
+	    console.log(e.name == 'TypeError');
+	    if(e.name != 'TypeError'){
             texto_padrao = `Reveja a sintaxe de PETEQS na documentação<br>
             Possíveis causas de erro são:<br>
             * Quebras de linha no lugar errado<br>
             * Omissão de acentuação em um lugar onde deveria ter acento (ex.: Função 'mistério' sendo chamada como 'misterio')<br>
             * Erros de digitação<br>
             `;
-            return PQ_print(target, "<br>Existe um erro no código<br>", "<br>***************<br><br>", texto_padrao);
+
+            return PQ_print(target, "<br>Existe um erro no código<br>", "<br>***************<br><br>", texto_padrao,e);
+	}
         }
     },
     /**
