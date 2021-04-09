@@ -54,7 +54,7 @@ IPETEQS possui também desvios condicionais, que atuam nos operadores lógicos `
 
     SE b < 100 ENTÃO
       //Faça algo aqui
-    SENÂO
+    SENÃO
       //Faça outra coisa aqui
     FIM SE  
 
@@ -102,7 +102,7 @@ PETEQS também possui procedimentos e funções, que permitem a modularização 
        FIM SE
     FIM
 
-    PROCEDIMENTO ImprimePares
+    PROCEDIMENTO ImprimePares()
     INÍCIO
       PARA i<- 0 ATÉ 100 FAÇA
          SE É_PAR(i) ENTÃO
@@ -125,7 +125,7 @@ As funções de entrada e saída básicas de PETEQS são `leia`, `imprima` e `im
     imprima gato_3
 
     //Com as funções de entrada PETEQS, com o uso de vetores podemos:
-    PARA i<1 ATÉ 3 FAÇA
+    PARA i<-1 ATÉ 3 FAÇA
       leia gato[i]
       imprima gato[i]
     FIM PARA
