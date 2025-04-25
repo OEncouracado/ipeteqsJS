@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Funcionários</title>
+<style>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    /* Impede a rolagem horizontal globalmente */
+    html, body {
+        overflow-y: hidden;  /* Remove a rolagem horizontal */
+        margin: 0;  /* Remove margens desnecessárias */
+        padding: 0; /* Remove espaçamento adicional */
+        width: 100%; /* Garante que a largura do body seja 100% da tela */
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f4f4f9;
+        padding: 10px;
+    }
+
+    .section {
+        margin-bottom: 20px;
+        margin-top: 5%;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .section h2 {
+        background-color: #FF6952;
+        color: white;
+        padding: 10px;
+        margin: 0;
+        text-align: center; /* Centraliza o texto do título da seção */
+    }
+
+    .section h3 {
+        color: #FF6952;
+        padding: 10px;
+        margin: 0;
+        text-align: left;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: left; /* Alinha o texto à esquerda */
+        word-break: break-word;
+    }
+
+    th {
+        background-color: #e0e0e0; /* Alterado para um cinza mais claro */
+        color: #333;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    @media (max-width: 600px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        tr {
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            display: block;
+            position: relative;
+        }
+
+        td {
+            border: none;
+            position: relative;
+            padding-left: 50%;
+            text-align: right;
+        }
+
+        td:before {
+            content: attr(data-label);
+            position: absolute;
+            right: 10px;
+            width: 50%;
+            padding-left: 10px;
+            font-weight: bold;
+            text-align: left;
+        }
+    }
+
+    .search-container {
+        z-index: 1000;
+        margin-bottom: 20px;
+    }
+
+    .search-container input {
+        z-index: 1000;
+        padding: 10px;
+        font-size: 16px;
+        position: fixed;
+        top: 8px;
+        left: 21px;
+        width: 85%;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+</style>
+</head>
+<body>
+
+    <div class="container-fluid">
+
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar por nome, cargo ou ramal...">
+    </div>
+
+    <!-- Seção de Recepção -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="recepçãoSection">
+        
+        <h2>Recepção</h2>
+        <table id="recepçãoTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Thamires Araujo</td>
+                    <td data-label="Cargo">Administrative Assistant I</td>
+                    <td data-label="Ramal">200</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Diretoria -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="diretoriaSection">
+        <h2>Diretoria</h2>
+        <table style="width: 100%; table-layout: auto;" table id="diretoriaTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">José SOUZA</td>
+                    <td data-label="Cargo">Diretor</td>
+                    <td data-label="Ramal">201</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Gerência -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="gerentesSection">
+        <h2>Gerentes</h2>
+        <table style="width: 100%; table-layout: auto;" table id="gerentesTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Fora de Uso</td>
+                    <td data-label="Cargo">Fora de Uso</td>
+                    <td data-label="Ramal">202</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Claudilene SILVA</td>
+                    <td data-label="Cargo">Financeiro</td>
+                    <td data-label="Ramal">203</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Eduardo FIGUEIREDO</td>
+                    <td data-label="Cargo">Monitoramento de Dados</td>
+                    <td data-label="Ramal">204</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Daniel RODRIGUES</td>
+                    <td data-label="Cargo">Labtec</td>
+                    <td data-label="Ramal">205</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Erick CARVALHO</td>
+                    <td data-label="Cargo">Projeto</td>
+                    <td data-label="Ramal">206</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Marlon SOUZA</td>
+                    <td data-label="Cargo">Integração</td>
+                    <td data-label="Ramal">207</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Anderson DESSAUNE</td>
+                    <td data-label="Cargo">Hidrologia</td>
+                    <td data-label="Ramal">208</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Almoxarifado -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="almoxarifadoSection">
+        <h2>Almoxarifado</h2>
+        <h3>Grupo de Ramal (607)</h3>
+        <table id="almoxarifadoTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Danilo FREITAS</td>
+                    <td data-label="Cargo">Warehouse Supervisor III</td>
+                    <td data-label="Ramal">211</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Ana MACIEL</td>
+                    <td data-label="Cargo">Logistics Technician</td>
+                    <td data-label="Ramal">212</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">João</td>
+                    <td data-label="Cargo">Tax Assistant IV</td>
+                    <td data-label="Ramal">213</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Integração -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="integraçãoSection">
+        <h2>Integração (ACOEM/JCTM)</h2>
+        <table id="integraçãoTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Patrícia TEIXEIRA</td>
+                    <td data-label="Cargo">Integração (ACOEM/JCTM)</td>
+                    <td data-label="Ramal">214</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Vendas -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="vendasSection">
+        <h2>Vendas</h2>
+        <h3>Grupo de Ramal (605)</h3>
+        <table id="vendasTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Hugo MOURA</td>
+                    <td data-label="Cargo">Sales Supervisor III</td>
+                    <td data-label="Ramal">215</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Felipe PINTO</td>
+                    <td data-label="Cargo">Sales Technician III</td>
+                    <td data-label="Ramal">216</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Paula PORTO</td>
+                    <td data-label="Cargo">Sales</td>
+                    <td data-label="Ramal">217</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">João GOUVEIA</td>
+                    <td data-label="Cargo">Contract Assistant</td>
+                    <td data-label="Ramal">218</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Claudino SILVA</td>
+                    <td data-label="Cargo">Commercial Supervisor</td>
+                    <td data-label="Ramal">219</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Thaiane CARLOS</td>
+                    <td data-label="Cargo">Administrative Assistant I</td>
+                    <td data-label="Ramal">220</td>
+                </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Compras -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="comprasSection">
+        <h2>Compras</h2>
+        <h3>Grupo de Ramal (606)</h3>
+        <table id="comprasTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Elenice RODRIGUES</td>
+                    <td data-label="Cargo">Purchasing Assistant III</td>
+                    <td data-label="Ramal">221</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Contratos -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="contratosSection">
+        <h2>Contratos</h2>
+        <h3>Grupo de Ramal (604)</h3>
+        <table id="contratosTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Thaise ESCHA</td>
+                    <td data-label="Cargo">Contracts Assistant</td>
+                    <td data-label="Ramal">222</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Seção de Financeiro -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="financeiroSection">
+        <h2>Financeiro</h2>
+        <h3>Grupo de Ramal (603)</h3>
+	<h3></h3>
+        <table id="financeiroTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Ludmila SILVA</td>
+                    <td data-label="Cargo">Purchasing Assistant IV</td>
+                    <td data-label="Ramal">223</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Andreina MARTINS</td>
+                    <td data-label="Cargo">Purchasing Assistant IV</td>
+                    <td data-label="Ramal">224</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Joice OLIVEIRA</td>
+                    <td data-label="Cargo">Financial Analyst II</td>
+                    <td data-label="Ramal">225</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Isabella OLIVEIRA</td>
+                    <td data-label="Cargo">Administrative Assistant I</td>
+                    <td data-label="Ramal">226</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Stephanne BAPTISTA</td>
+                    <td data-label="Cargo">Young Apprentice</td>
+                    <td data-label="Ramal">227</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Jéssica</td>
+                    <td data-label="Cargo">Young Apprentice</td>
+                    <td data-label="Ramal">229</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Labtec -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="labtecSection">
+        <h2>Labtec</h2>
+	<h3></h3>
+        <table id="labtecTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Equipe</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Equipe Técnica</td>
+                    <td data-label="Cargo"> 
+                        <title>modal Equipe</title>
+                        <style>
+                            /* O fundo da modal */
+                            .modal {
+                                display: none; /* Esconde a modal por padrão */
+                                position: fixed; /* Fica fixo na tela */
+                                z-index: 1; /* Fica acima de outros conteúdos */
+                                left: 0;
+                                top: 0;
+                                width: 100%; /* Largura total */
+                                height: 100%; /* Altura total */
+                                overflow: auto; /* Adiciona rolagem se necessário */
+                                background-color: rgba(0,0,0,0.4); /* Fundo semi-transparente */
+                            }
+                    
+                            /* Conteúdo da modal */
+                            .modal-content {
+                                background-color: #fefefe;
+                                margin: auto; /* Centraliza vertical e horizontalmente */
+                                padding: 20px;
+                                border: 1px solid #888;
+                                width: 80%; /* Largura da modal */
+                                max-width: 600px; /* Largura máxima da modal */
+                                position: relative; /* Necessário para posicionamento absoluto dos elementos internos */
+                                top: 60%; /* Desloca o conteúdo da modal para baixo */
+                                transform: translateY(-50%); /* Ajusta a posição vertical para centralizar */
+                                text-align: center;
+                            }
+                    
+                            /* O botão de fechar */
+                            .close {
+                                color: #aaa;
+                                float: right;
+                                font-size: 28px;
+                                font-weight: bold;
+                            }
+                    
+                            .close:hover,
+                            .close:focus {
+                                color: black;
+                                text-decoration: none;
+                                cursor: pointer;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <!-- Botão para abrir a modal -->
+                        <button id="openModalBtn">Ver Equipe</button>
+                    
+                        <!-- Modal -->
+                        <div id="EquipeModal" class="modal">
+                            <div style="width: 80dvw; max-width: 80dvw; overflow-x: hidden; overflow-y: auto;" div class="modal-content">
+                                <span class="close"data-modal="EquipeModal">&times;</span>
+                                <h2>Equipe</h2>
+                                <p>Rafael SILVA - Técnico de Instrumentação</p>
+                                <p>SILVA - Técnico de Eletrônica</p> 
+                                <p>Lucas ROSA - Técnico de Eletrônica</p> 
+                                <p>Eric SANTOS - Assistente Técnico de Eletrônica</p>
+                                <p>João MASSANTE - Assistente Técnico de Eletrônica</p>
+
+                            </div>
+                        </div>
+                    
+                        <script>
+                            // Obtém o modal
+                            const Equipemodal = document.getElementById('EquipeModal');
+                    
+                            // Obtém o botão que abre a modal
+                            const openModalBtn = document.getElementById('openModalBtn');
+                    
+                            // Obtém o elemento <span> que fecha a modal
+                            const closeBtn = document.getElementsByClassName('close')[0];
+                    
+                            // Quando o usuário clicar no botão, abre a modal
+                            openModalBtn.onclick = function() {
+                                Equipemodal.style.display = 'block';
+                            }
+                    
+                            // Quando o usuário clicar no <span> (x), fecha a modal
+                            closeBtn.onclick = function() {
+                                Equipemodal.style.display = 'none';
+                            }
+                    
+                            // Quando o usuário clicar fora da modal, fecha a modal
+                            window.onclick = function(event) {
+                                if (event.target === Equipemodal) {
+                                    Equipemodal.style.display = 'none';
+                                }
+                            }
+                        </script>
+                    </td>
+                    <td data-label="Ramal">228</td>
+                </tr>            
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Monitoramento de Dados -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="monitoramentodedadosSection">
+        <h2>Monitoramento de Dados</h2>
+	<h3>Grupo de Ramal (608)</h3>
+        <table id="monitoramentodedadosTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Treissy</td>
+                    <td data-label="Setor">Data Monitoring Assistant I</td>
+                    <td data-label="Ramal">230</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Thais SANTOS</td>
+                    <td data-label="Cargo">Environmental Data Assistant II</td>
+                    <td data-label="Ramal">231</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Daniele NASCIMENTO</td>
+                    <td data-label="Cargo">Environmental Data Assistant III</td>
+                    <td data-label="Ramal">232</td>
+                </tr>
+                <tr>
+                    <td data-label="Nome">Layla</td>
+                    <td data-label="Cargo">Environmental Data Assistant I</td>
+                    <td data-label="Ramal">233</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Manutenção -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="manutençãoSection">
+        <h2>Manutenção</h2>
+	<h3></h3>
+        <table id="manutençãoTable">
+            <thead>
+                <tr>
+                    <th>Responsável</th>
+                    <th>Equipe</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Supervisor Manutenção - Leonardo PELICIONI</td>
+                    <td data-label="Cargo">
+                        <title>Modal</title>
+                        <style>
+                            /* O fundo da modal */
+                            .modal {
+                                display: none; /* Escondido por padrão */
+                                position: fixed; /* Fixo na tela */
+                                z-index: 1; /* Em cima dos outros conteúdos */
+                                left: 0;
+                                top: 0;
+                                width: 100%; /* Largura total da tela */
+                                height: 100%; /* Altura total da tela */
+                                overflow: auto; /* Adiciona barra de rolagem se necessário */
+                                background-color: rgba(0,0,0,0.4); /* Fundo escuro semitransparente */
+                            }
+                    
+                            /* Conteúdo da modal */
+                            .modal-content {
+                                background-color: #fefefe;
+                                margin: 15% auto; /* Centraliza verticalmente */
+                                padding: 20px;
+                                border: 1px solid #888;
+                                width: 80%; /* Largura da modal */
+                            }
+                    
+                            /* Botão de fechar (x) */
+                            .close2 {
+                                color: #aaa;
+                                float: right;
+                                font-size: 28px;
+                                font-weight: bold;
+                            }
+                    
+                            .close2:hover,
+                            .close2:focus {
+                                color: black;
+                                text-decoration: none;
+                                cursor: pointer;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <button id="openModalBtn2">Ver Equipe</button>
+                    
+                        <!-- Modal -->
+                        <div id="myModal2" class="modal">
+                            <div style="width: 80dvw; max-width: 80dvw; overflow-x: hidden; overflow-y: auto;" div class="modal-content">
+                                <span class="close2"data-modal="myModal2">&times;</span>
+                                <h2>Ramal 234</h2>
+                                <p>Eduardo SANTOS - Maintenance Technician I</p>
+                                <p>Ricardo SILVA - Maintenance Assistant</p>
+                            </div>
+                        </div>
+                    
+                        <script>
+                            // Obtém os elementos
+                            const modal2 = document.getElementById('myModal2');
+                            const btn2 = document.getElementById('openModalBtn2');
+                            const span2 = document.getElementsByClassName('close2')[0];
+                    
+                            // Abre a modal quando o botão é clicado
+                            btn2.onclick = function() {
+                                modal2.style.display = 'block';
+                            }
+                    
+                            // Fecha a modal quando o usuário clica no (x)
+                            span2.onclick = function() {
+                                modal2.style.display = 'none';
+                            }
+                    
+                            // Fecha a modal quando o usuário clica fora da modal
+                            window.onclick = function(event) {
+                                if (event.target == modal2) {
+                                    modal2.style.display = 'none';
+                                }
+                            }
+                        </script>
+                    </td>
+                    <td data-label="Ramal">234</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Seção de Logística -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="logísticaSection">
+        <h2>Logística</h2>
+        <table id="logísticaTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Equipe</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Gerente Marlon SOUZA</td>
+                    <td data-label="Cargo"><title>Modal</title>
+                        <style>
+                    
+                            /* Botão de fechar (x) */
+                            .close3 {
+                                color: #aaa;
+                                float: right;
+                                font-size: 28px;
+                                font-weight: bold;
+                            }
+                    
+                            .close3:hover,
+                            .close3:focus {
+                                color: black;
+                                text-decoration: none;
+                                cursor: pointer;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <button id="openModalBtn3">Ver Equipe</button>
+                    
+                        <!-- Modal -->
+                        <div id="myModal3" class="modal">
+                            <div style="width: 80dvw; max-width: 80dvw; overflow-x: hidden; overflow-y: auto;" div class="modal-content">
+                                <span class="close3"data-modal="myModal3">&times;</span>
+                                <h2>Ramal 235</h2>
+                                <p>Willian SOUZA - Logistics Technician III</p>
+                                <p>Valdir Valente - Production Technician III</p>
+                            </div>
+                        </div>
+                    
+                        <script>
+                            // Obtém os elementos
+                            const modal3 = document.getElementById('myModal3');
+                            const btn3 = document.getElementById('openModalBtn3');
+                            const span3 = document.getElementsByClassName('close3')[0];
+                    
+                            // Abre a modal quando o botão é clicado
+                            btn3.onclick = function() {
+                                modal3.style.display = 'block';
+                            }
+                    
+                            // Fecha a modal quando o usuário clica no (x)
+                            span3.onclick = function() {
+                                modal3.style.display = 'none';
+                            }
+                    
+                            // Fecha a modal quando o usuário clica fora da modal
+                            window.onclick = function(event) {
+                                if (event.target == modal3) {
+                                    modal3.style.display = 'none';
+                                }
+                            }
+                        </script>
+                    </td>
+                    <td data-label="Ramal">235</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- Seção de Serralheria -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="SerralheriaSection">
+        <h2>Serralheria</h2>
+        <table id="SerralheriaTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Equipe</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Serralheria</td>
+                    <td data-label="Cargo"><title>Modal</title>
+                        <style>
+                    
+                            /* Botão de fechar (x) */
+                            .close4 {
+                                color: #aaa;
+                                float: right;
+                                font-size: 28px;
+                                font-weight: bold;
+                            }
+                    
+                            .close4:hover,
+                            .close4:focus {
+                                color: black;
+                                text-decoration: none;
+                                cursor: pointer;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <button id="openModalBtn4">Ver Equipe</button>
+                    
+                        <!-- Modal -->
+                        <div id="myModal4" class="modal">
+                            <div style="width: 80dvw; max-width: 80dvw; overflow-x: hidden; overflow-y: auto;" div class="modal-content">
+                                <span class="close4"data-modal="myModal4">&times;</span>
+                                <h2>Ramal 236</h2>
+                            </div>
+                        </div>
+                    
+                        <script>
+                            // Obtém os elementos
+                            const modal4 = document.getElementById('myModal4');
+                            const btn4 = document.getElementById('openModalBtn4');
+                            const span4 = document.getElementsByClassName('close4')[0];
+                    
+                            // Abre a modal quando o botão é clicado
+                            btn4.onclick = function() {
+                                modal4.style.display = 'block';
+                            }
+                    
+                            // Fecha a modal quando o usuário clica no (x)
+                            span4.onclick = function() {
+                                modal4.style.display = 'none';
+                            }
+                    
+                            // Fecha a modal quando o usuário clica fora da modal
+                            window.onclick = function(event) {
+                                if (event.target == modal4) {
+                                    modal4.style.display = 'none';
+                                }
+                            }
+                        </script>
+                    </td>
+                    <td data-label="Ramal">236</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- Seção de Produção -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="ProducaoSection">
+        <h2>Produção</h2>
+        <table id="ProducaoTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Equipe</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Produção</td>
+                    <td data-label="Cargo"><title>Modal</title>
+                        <style>
+                    
+                            /* Botão de fechar (x) */
+                            .close5 {
+                                color: #aaa;
+                                float: right;
+                                font-size: 28px;
+                                font-weight: bold;
+                            }
+                    
+                            .close5:hover,
+                            .close5:focus {
+                                color: black;
+                                text-decoration: none;
+                                cursor: pointer;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <button id="openModalBtn5">Ver Equipe</button>
+                    
+                        <!-- Modal -->
+                        <div id="myModal5" class="modal">
+                            <div style="width: 80dvw; max-width: 80dvw; overflow-x: hidden; overflow-y: auto;" div class="modal-content">
+                                <span class="close5"data-modal="myModal5">&times;</span>
+                                <h2>Ramal 237</h2>
+                            </div>
+                        </div>
+                    
+                        <script>
+                            // Obtém os elementos
+                            const modal5 = document.getElementById('myModal5');
+                            const btn5 = document.getElementById('openModalBtn5');
+                            const span5 = document.getElementsByClassName('close5')[0];
+                    
+                            // Abre a modal quando o botão é clicado
+                            btn5.onclick = function() {
+                                modal5.style.display = 'block';
+                            }
+                    
+                            // Fecha a modal quando o usuário clica no (x)
+                            span5.onclick = function() {
+                                modal5.style.display = 'none';
+                            }
+                    
+                            // Fecha a modal quando o usuário clica fora da modal
+                            window.onclick = function(event) {
+                                if (event.target == modal5) {
+                                    modal5.style.display = 'none';
+                                }
+                            }
+                        </script>
+                    </td>
+                    <td data-label="Ramal">237</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Operações -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="operaçõesSection">
+        <h2>Operações</h2>
+        <table id="operaçõesTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Tarcisio GUIMARÃES</td>
+                    <td data-label="Cargo">Production Supervisor II</td>
+                    <td data-label="Ramal">238</td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Cássia AMORIM</td>
+                    <td data-label="Cargo">Administrative Assistant III</td>
+                    <td data-label="Ramal">239</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+       <!-- Seção de Projetos -->
+       <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="projetosSection">
+        <h2>Projetos</h2>
+        <table id="projetosTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Carlos PAULA</td>
+                    <td data-label="Cargo">Project Technician V</td>
+                    <td data-label="Ramal">240</td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Gabriel OLIVEIRA</td>
+                    <td data-label="Cargo">Technical Assistant in Electronics V</td>
+                    <td data-label="Ramal">241</td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Eduarda FERREIRA</td>
+                    <td data-label="Cargo">Project Assistant</td>
+                    <td data-label="Ramal">242</td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Victor ALMEIDA</td>
+                    <td data-label="Cargo">Project Assistant</td>
+                    <td data-label="Ramal">243	</td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Davi BARBOSA</td>
+                    <td data-label="Cargo">Programmer (PJ)</td>
+                    <td data-label="Ramal">244</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Lacsm -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="lacsmSection">
+        <h2>Lacsm</h2>
+        <table id="lacsmTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Andrielly MARTINS</td>
+                    <td data-label="Cargo">Quality Supervisor II</td>
+                    <td data-label="Ramal">245</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Recursos Humanos -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="RecursosHumanosSection">
+        <h2>Recursos Humanos</h2>
+        <table id="RecursosHumanosTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Lucas SILVA</td>
+                    <td data-label="Cargo">Occupational Safety Technician IV</td>
+                    <td data-label="Ramal">246</td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Roberta SILVA</td>
+                    <td data-label="Cargo">DP/HR Analyst III</td>
+                    <td data-label="Ramal">247</td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Lucas SANTOS</td>
+                    <td data-label="Cargo">DP/HR Assistant I</td>
+                    <td data-label="Ramal">248</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Tecnologia da Informação -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="TecnologiadaInformaçãoSection">
+        <h2>Tecnologia da Informação</h2>
+        <table id="TecnologiadaInformaçãoTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Vander MACHADO</td>
+                    <td data-label="Cargo">IT Supervisor V</td>
+                    <td data-label="Ramal">249</td>
+                </tr>
+                <tbody>
+                    <tr>
+                        <td data-label="Nome">Eduardo ALMEIDA</td>
+                        <td data-label="Cargo">IT Analyst II</td>
+                        <td data-label="Ramal">250</td>
+                    </tr>
+                <tbody>
+                <tr>
+                    <td data-label="Nome">Carlos SANTOS</td>
+                    <td data-label="Cargo">IT Analyst I</td>
+                    <td data-label="Ramal">251</td>
+                </tr>
+                <tbody>
+                    <tr>
+                        <td data-label="Nome">Marcos URSELINO</td>
+                        <td data-label="Cargo">IT Analyst I</td>
+                        <td data-label="Ramal">252</td>
+                    </tr>
+                <tbody>
+                <tr>
+                    <td data-label="Nome">Rodrigo ROSA</td>
+                    <td data-label="Cargo">External Support</td>
+                    <td data-label="Ramal">253</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Seção de Hidrologia -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="HidrologiaSection">
+        <h2>Hidrologia</h2>
+        <table id="HidrologiaTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Vinícius SILVA</td>
+                    <td data-label="Cargo">Electronics Technician I</td>
+                    <td data-label="Ramal">255</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- Seção de Tecnicos -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="TecnicosSection">
+        <h2>Técnicos</h2>
+        <table id="TecnicosTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Marcos MELO</td>
+                    <td data-label="Cargo">IT TECHNICAL ANALYST IV</td>
+                    <td data-label="Ramal">256</td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Philipp CARDOSO</td>
+                    <td data-label="Cargo">SUPPORT ANALYST II</td>
+                    <td data-label="Ramal">257</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- Seção de Reunião -->
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="section" id="sala12Section">
+        <h2>Sala de Reuniões</h2>
+        <table id="sala12Table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Ramal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Nome">Sala de Reuniões</td>
+                    <td data-label="Cargo">Sala 12</td>
+                    <td data-label="Ramal">259</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchValue = this.value.toLowerCase();
+            filterTables(searchValue);
+        });
+    
+        function filterTables(searchValue) {
+            const tables = [
+                { tableId: 'recepçãoTable', sectionId: 'recepçãoSection' },
+                { tableId: 'diretoriaTable', sectionId: 'diretoriaSection' },
+                { tableId: 'gerentesTable', sectionId: 'gerentesSection' },
+                { tableId: 'almoxarifadoTable', sectionId: 'almoxarifadoSection' },
+                { tableId: 'integraçãoTable', sectionId: 'integraçãoSection' },
+                { tableId: 'vendasTable', sectionId: 'vendasSection' },
+                { tableId: 'comprasTable', sectionId: 'comprasSection' },
+                { tableId: 'contratosTable', sectionId: 'contratosSection' },
+                { tableId: 'financeiroTable', sectionId: 'financeiroSection' },
+                { tableId: 'labtecTable', sectionId: 'labtecSection' },
+                { tableId: 'monitoramentodedadosTable', sectionId: 'monitoramentodedadosSection' },
+                { tableId: 'manutençãoTable', sectionId: 'manutençãoSection' },
+                { tableId: 'logísticaTable', sectionId: 'logísticaSection' },
+                { tableId: 'SerralheriaTable', sectionId: 'SerralheriaSection' },
+                { tableId: 'ProducaoTable', sectionId: 'ProducaoSection' },
+                { tableId: 'operaçõesTable', sectionId: 'operaçõesSection' },
+                { tableId: 'projetosTable', sectionId: 'projetosSection' },
+                { tableId: 'lacsmTable', sectionId: 'lacsmSection' },
+                { tableId: 'RecursosHumanosTable', sectionId: 'RecursosHumanosSection' },
+                { tableId: 'TecnologiadaInformaçãoTable', sectionId: 'TecnologiadaInformaçãoSection' },
+                { tableId: 'HidrologiaTable', sectionId: 'HidrologiaSection' },
+                { tableId: 'TecnicosTable', sectionId: 'TecnicosSection' },
+                { tableId: 'sala12Table', sectionId: 'sala12Section' },
+
+            ];
+    
+            const isSearchEmpty = searchValue.trim() === '';
+    
+            tables.forEach(({ tableId, sectionId }) => {
+                const table = document.getElementById(tableId);
+                const section = document.getElementById(sectionId);
+    
+                // Se a pesquisa estiver vazia, mostra todas as seções e aplica filtro na tabela
+                if (isSearchEmpty) {
+                    section.style.display = '';
+                    showAllRows(table); // Mostra todas as linhas na tabela
+                } else {
+                    const tableNameMatches = tableId.replace('Table', '').toLowerCase().includes(searchValue);
+    
+                    // Mostra a seção se o nome da tabela ou o conteúdo da tabela corresponder à pesquisa
+                    if (tableNameMatches || filterTable(table, searchValue)) {
+                        section.style.display = '';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                }
+            });
+        }
+    
+        function filterTable(table, searchValue) {
+            const rows = table.querySelectorAll('tbody tr');
+            let hasVisibleRows = false;
+    
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let rowText = '';
+                cells.forEach(cell => {
+                    rowText += cell.textContent.toLowerCase() + ' ';
+                });
+    
+                if (rowText.includes(searchValue)) {
+                    row.style.display = '';
+                    hasVisibleRows = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+    
+            return hasVisibleRows; // Retorna se há linhas visíveis
+        }
+    
+        function showAllRows(table) {
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                row.style.display = ''; // Mostra todas as linhas
+            });
+        }
+    </script>
+    
+    <style>
+        .top-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 54px;
+                background: rgba(0, 0, 0, 0.5); /* Fundo transparente preto */
+                padding: 10px;
+                box-sizing: border-box;
+                z-index: 100; /* Garante que a div fique acima de outros elementos */
+                display: flex;
+                align-items: center;
+                justify-content: space-between; /* Alinha itens no topo a esquerda e direita */
+            }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10;
+        }
+        #header {
+            position: fixed;
+            top: -1px;
+            right: 0px;
+            padding: 10px;
+            background-color: transparent; /* Remove o fundo do header */
+            z-index: 1000; /* Garante que o botão fique acima de outros conteúdos */
+        }
+        button {
+            z-index: 1000;
+            background-color: #FF6952; /* Verde */
+            color: white;
+            padding: 10px 20px; /* Ajusta o tamanho do botão */
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #c04e3c; /* Verde escuro */
+        }
+    </style>
+</head>
+
+
+
+
+
+    <div style="width: 100%; max-width: 100%; overflow-x: hidden; overflow-y: auto;" div class="top-container"></div>
+    <div id="header">
+        <button id="generateCsvBtn">Gerar CSV</button>
+    </div>
+
+</div>
+
+    <script>
+        document.getElementById('generateCsvBtn').addEventListener('click', () => {
+            // Selecionar todas as tabelas com os IDs especificados
+            const tableIds = [  
+                'recepçãoTable', 'diretoriaTable',
+                'gerentesTable', 'almoxarifadoTable',
+                'integraçãoTable', 'vendasTable',
+                'comprasTable', 'contratosTable',
+                'financeiroTable', 'labtecTable',
+                'monitoramentodedadosTable', 'manutençãoTable',
+                'logísticaTable','operaçõesTable',
+                'projetosTable','lacsmTable',
+                'RecursosHumanosTable','TecnologiadaInformaçãoTable',
+                'HidrologiaTable'
+            ];
+    
+            let allData = [];
+            let headersAdded = false;
+    
+            tableIds.forEach((id) => {
+                const table = document.getElementById(id);
+                if (!table) {
+                    console.error(`Tabela com ID ${id} não encontrada.`);
+                    return;
+                }
+    
+                const rows = Array.from(table.querySelectorAll('tr'));
+    
+                // Extrair o cabeçalho da tabela
+                const headers = Array.from(rows.shift().querySelectorAll('th'))
+                    .map(th => th.innerText);
+    
+                // Identificar o índice das colunas "Nome" e "Ramal"
+                const nomeIndex = headers.indexOf('Nome');
+                const ramalIndex = headers.indexOf('Ramal');
+    
+                // Adicionar o cabeçalho fixo, excluindo "Nome" e "Ramal"
+                if (!headersAdded) {
+                    allData.push([
+                        'First Name', 'Last Name', 'Phone Number', 'Mobile Number', 'E-mail Address', 'Address', 'City', 'State', 'Postal Code', 'Comment', 'Id', 'Info', 'Presence', 'Directory', 'Starred'
+                    ]); // Adiciona o cabeçalho fixo
+                    headersAdded = true;
+                }
+    
+                // Extrair os dados da tabela, excluindo as colunas "Nome" e "Ramal" e adicionando o sufixo
+                const data = rows.map(row => {
+                    const cells = Array.from(row.querySelectorAll('td')).map(td => td.innerText);
+    
+                    // Extraindo o nome completo e o ramal
+                    const nomeCompleto = nomeIndex !== -1 ? cells[nomeIndex] : ''; // Nome completo
+                    const ramalOriginal = ramalIndex !== -1 ? cells[ramalIndex] : ''; // Ramal original
+                    const ramalComPrefixo = ramalIndex !== -1 ? `598${cells[ramalIndex]}` : ''; // Ramal com prefixo
+                    
+                    // Separando o nome completo em "First Name" e "Last Name"
+                    const [firstName, lastName] = nomeCompleto.split(' ');
+    
+                    return [
+                        firstName || '', // First Name
+                        lastName || '', // Last Name
+                        ramalOriginal, ramalComPrefixo,'', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '' // Dados adicionais
+                    ];
+                });
+    
+                // Adicionar os dados da tabela
+                allData = allData.concat(data);
+            });
+    
+            // Função para converter dados para CSV
+            const convertToCSV = (array) => {
+                return array.map(row => 
+                    row.map(cell => 
+                        cell.toString().replace(/,/g, ';') // Substitui as vírgulas por ponto e vírgula para evitar problemas com delimitadores
+                    ).join(',')
+                ).join('\n');
+            };
+    
+            // Gerar o conteúdo CSV
+            const csvContent = convertToCSV(allData);
+    
+            // Criar um link temporário para download
+            const encodedUri = encodeURI('data:text/csv;charset=utf-8,' + csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'dados.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+
+
+        
+    </script>
+</body>
+    
